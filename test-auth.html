@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Authentication</title>
+    <script type="module">
+      import { isLoggedIn, getCurrentUser } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Auth test started");
+        console.log("Is logged in:", isLoggedIn());
+        console.log("Current user:", getCurrentUser());
+        console.log("Token exists:", !!localStorage.getItem("token"));
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Authentication Test</h1>
+    <p>Check the browser console for results.</p>
+    <button onclick="location.href='login.html'">Test Login Page</button>
+    <button onclick="location.href='signup.html'">Test Signup Page</button>
+  </body>
+</html>

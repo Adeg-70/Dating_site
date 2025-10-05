@@ -1,0 +1,11 @@
+{
+  "environment": "production",
+  "port": 5000,
+  "logLevel": "warn",
+  "corsOrigin": "https://yourdomain.com",
+  "uploadLimit": "20mb",
+  "rateLimit": {
+    "windowMs": 900000,
+    "max": 50
+  }
+}

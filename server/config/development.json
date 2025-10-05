@@ -1,0 +1,11 @@
+{
+  "environment": "development",
+  "port": 5000,
+  "logLevel": "debug",
+  "corsOrigin": "http://localhost:3000",
+  "uploadLimit": "50mb",
+  "rateLimit": {
+    "windowMs": 900000,
+    "max": 100
+  }
+}
