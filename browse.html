@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse Matches - LoveConnect</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Browse-specific styles */
+      .browse-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+      }
+
+      .browse-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .browse-title {
+        font-size: 2rem;
+        color: #333;
+      }
+
+      /* Filters */
+      .filters {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .filter-title {
+        font-size: 1.3rem;
+        color: #333;
+      }
+
+      .filter-toggle {
+        background: none;
+        border: none;
+        color: #e91e63;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .filter-group {
+        margin-bottom: 1rem;
+      }
+
+      .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #444;
+      }
+
+      .filter-group input,
+      .filter-group select {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+
+      .filter-group .range-values {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .filter-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .filter-btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .reset-btn {
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+
+      .apply-btn {
+        background: #e91e63;
+        color: white;
+        border: none;
+      }
+
+      /* Results header */
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .results-count {
+        color: #666;
+      }
+
+      .view-options {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .view-option {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .view-option.active {
+        background: #fce4ec;
+        border-color: #e91e63;
+        color: #e91e63;
+      }
+
+      /* Matches grid */
+      .matches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .match-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s;
+        position: relative;
+      }
+
+      .match-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .match-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #e91e63;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        z-index: 2;
+      }
+
+      .match-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        position: relative;
+      }
+
+      .match-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+        padding: 1rem;
+        color: white;
+      }
+
+      .match-name {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .match-age {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .match-info {
+        padding: 1.5rem;
+      }
+
+      .match-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .match-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .match-bio {
+        color: #444;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .match-interests {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .match-interest {
+        background: #f8f9fa;
+        color: #666;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+      }
+
+      .match-actions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .match-btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        flex: 1;
+        margin: 0 0.3rem;
+      }
+
+      .dislike-btn {
+        background: #f8f9fa;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+
+      .dislike-btn:hover {
+        background: #e9ecef;
+      }
+
+      .like-btn {
+        background: #e91e63;
+        color: white;
+        border: none;
+      }
+
+      .like-btn:hover {
+        background: #d81b60;
+      }
+
+      .superlike-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+      }
+
+      .superlike-btn:hover {
+        background: #45a049;
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .page-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: white;
+        border: 1px solid #ddd;
+        cursor: pointer;
+      }
+
+      .page-btn.active {
+        background: #e91e63;
+        color: white;
+        border-color: #e91e63;
+      }
+
+      .page-btn:hover:not(.active) {
+        background: #f8f9fa;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .matches-grid {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .browse-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .filter-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .matches-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .match-actions {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .match-btn {
+          margin: 0;
+        }
+      }
+
+      /* Filter collapse state */
+      .filters.collapsed .filter-grid,
+      .filters.collapsed .filter-actions {
+        display: none;
+      }
+
+      /* Match detail modal */
+      .match-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .modal-body {
+        padding: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <!-- For logged in state (browse, dashboard, profile) -->
+          <li class="nav-item">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="browse.html" class="nav-link">Browse</a>
+          </li>
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link">Messages</a>
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Browse Content -->
+    <div class="browse-container">
+      <div class="browse-header">
+        <h1 class="browse-title">Browse Matches</h1>
+        <div class="search-bar">
+          <input type="text" placeholder="Search by name, interest..." />
+          <span>🔍</span>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters" id="filtersSection">
+        <div class="filter-header">
+          <h2 class="filter-title">Filters</h2>
+          <button class="filter-toggle" id="filterToggle">
+            <span>Collapse Filters</span>
+            <span>▲</span>
+          </button>
+        </div>
+
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label for="gender">Gender</label>
+            <select id="gender">
+              <option value="any">Any</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="ageRange">Age Range</label>
+            <input type="range" id="ageRange" min="18" max="80" value="40" />
+            <div class="range-values">
+              <span>18</span>
+              <span id="ageValue">18-40</span>
+              <span>80</span>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" placeholder="City or zip code" />
+          </div>
+
+          <div class="filter-group">
+            <label for="distance">Distance (miles)</label>
+            <select id="distance">
+              <option value="5">5 miles</option>
+              <option value="10" selected>10 miles</option>
+              <option value="25">25 miles</option>
+              <option value="50">50 miles</option>
+              <option value="100">100 miles</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="interest">Interests</label>
+            <select id="interest">
+              <option value="">Any interest</option>
+              <option value="travel">Travel</option>
+              <option value="music">Music</option>
+              <option value="sports">Sports</option>
+              <option value="food">Food</option>
+              <option value="movies">Movies</option>
+              <option value="art">Art</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="relationship">Relationship Goal</label>
+            <select id="relationship">
+              <option value="">Any</option>
+              <option value="dating">Dating</option>
+              <option value="relationship">Relationship</option>
+              <option value="marriage">Marriage</option>
+              <option value="friendship">Friendship</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button class="filter-btn reset-btn" id="resetFilters">Reset</button>
+          <button class="filter-btn apply-btn" id="applyFilters">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Header -->
+      <div class="results-header">
+        <div class="results-count">Showing 12 matches near you</div>
+        <div class="view-options">
+          <button class="view-option active" data-view="grid">Grid</button>
+          <button class="view-option" data-view="list">List</button>
+        </div>
+      </div>
+
+      <!-- Matches Grid -->
+      <div class="matches-grid" id="matchesView">
+        <!-- Match 1 -->
+        <div class="match-card">
+          <span class="match-badge">Online</span>
+          <img
+            src="https://placehold.co/400x300"
+            alt="Sarah"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Sarah</h3>
+            <div class="match-age">25 • Photographer</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 3 miles away</div>
+              <div class="match-detail">⭐ 89% match</div>
+            </div>
+            <p class="match-bio">
+              Adventure seeker and photography enthusiast. Love hiking, coffee,
+              and good conversations. Looking for someone to explore the world
+              with.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Photography</span>
+              <span class="match-interest">Hiking</span>
+              <span class="match-interest">Coffee</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 2 -->
+        <div class="match-card">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Jessica"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Jessica</h3>
+            <div class="match-age">27 • Teacher</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 5 miles away</div>
+              <div class="match-detail">⭐ 92% match</div>
+            </div>
+            <p class="match-bio">
+              Elementary school teacher who loves reading, painting, and trying
+              new restaurants. Looking for someone kind and genuine.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Reading</span>
+              <span class="match-interest">Art</span>
+              <span class="match-interest">Food</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 3 -->
+        <div class="match-card">
+          <span class="match-badge">New</span>
+          <img
+            src="https://placehold.co/400x300"
+            alt="Emma"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Emma</h3>
+            <div class="match-age">29 • Graphic Designer</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 7 miles away</div>
+              <div class="match-detail">⭐ 78% match</div>
+            </div>
+            <p class="match-bio">
+              Creative soul with a passion for design, music festivals, and
+              yoga. Looking for someone who appreciates art and adventure.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Design</span>
+              <span class="match-interest">Music</span>
+              <span class="match-interest">Yoga</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 4 -->
+        <div class="match-card">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Olivia"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Olivia</h3>
+            <div class="match-age">26 • Nurse</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 2 miles away</div>
+              <div class="match-detail">⭐ 95% match</div>
+            </div>
+            <p class="match-bio">
+              Dedicated nurse who enjoys hiking, cooking, and movie nights.
+              Looking for someone with a good sense of humor and kind heart.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Hiking</span>
+              <span class="match-interest">Cooking</span>
+              <span class="match-interest">Movies</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 5 -->
+        <div class="match-card">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Sophia"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Sophia</h3>
+            <div class="match-age">30 • Marketing Manager</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 4 miles away</div>
+              <div class="match-detail">⭐ 85% match</div>
+            </div>
+            <p class="match-bio">
+              Ambitious professional who enjoys traveling, wine tasting, and
+              live music. Looking for someone who can keep up with my energy.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Travel</span>
+              <span class="match-interest">Wine</span>
+              <span class="match-interest">Music</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 6 -->
+        <div class="match-card">
+          <span class="match-badge">Online</span>
+          <img
+            src="https://placehold.co/400x300"
+            alt="Ava"
+            class="match-image"
+          />
+          <div class="match-overlay">
+            <h3 class="match-name">Ava</h3>
+            <div class="match-age">24 • Student</div>
+          </div>
+          <div class="match-info">
+            <div class="match-details">
+              <div class="match-detail">📍 1 mile away</div>
+              <div class="match-detail">⭐ 91% match</div>
+            </div>
+            <p class="match-bio">
+              Psychology major who loves learning, coffee shops, and
+              volunteering. Looking for someone who values deep conversations.
+            </p>
+            <div class="match-interests">
+              <span class="match-interest">Psychology</span>
+              <span class="match-interest">Coffee</span>
+              <span class="match-interest">Volunteering</span>
+            </div>
+            <div class="match-actions">
+              <button class="match-btn dislike-btn">Pass</button>
+              <button class="match-btn like-btn">Like</button>
+              <button class="match-btn superlike-btn">Super Like</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button class="page-btn">←</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">→</button>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Match Detail Modal -->
+    <div class="match-modal" id="matchModal">
+      <div class="modal-content">
+        <div class="modal-close" id="closeModal">✕</div>
+        <div class="modal-body">
+          <h2>Match Details</h2>
+          <p>
+            This would show detailed information about the selected match. We'll
+            implement this in the next phase!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Browse page functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        // Age range slider
+        const ageRange = document.getElementById("ageRange");
+        const ageValue = document.getElementById("ageValue");
+
+        ageRange.addEventListener("input", function () {
+          ageValue.textContent = `18-${this.value}`;
+        });
+
+        // Filter toggle
+        const filterToggle = document.getElementById("filterToggle");
+        const filtersSection = document.getElementById("filtersSection");
+
+        filterToggle.addEventListener("click", function () {
+          filtersSection.classList.toggle("collapsed");
+
+          if (filtersSection.classList.contains("collapsed")) {
+            this.innerHTML = "<span>Expand Filters</span> <span>▼</span>";
+          } else {
+            this.innerHTML = "<span>Collapse Filters</span> <span>▲</span>";
+          }
+        });
+
+        // Reset filters
+        const resetFilters = document.getElementById("resetFilters");
+        resetFilters.addEventListener("click", function () {
+          document.getElementById("gender").value = "any";
+          document.getElementById("ageRange").value = 40;
+          document.getElementById("location").value = "";
+          document.getElementById("distance").value = "10";
+          document.getElementById("interest").value = "";
+          document.getElementById("relationship").value = "";
+
+          ageValue.textContent = "18-40";
+          alert("Filters have been reset");
+        });
+
+        // Apply filters
+        const applyFilters = document.getElementById("applyFilters");
+        applyFilters.addEventListener("click", function () {
+          alert(
+            "Filters applied! In a real application, this would update the matches shown."
+          );
+        });
+
+        // View options
+        const viewOptions = document.querySelectorAll(".view-option");
+        const matchesView = document.getElementById("matchesView");
+
+        viewOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            viewOptions.forEach((opt) => opt.classList.remove("active"));
+            this.classList.add("active");
+
+            const viewType = this.getAttribute("data-view");
+            if (viewType === "list") {
+              matchesView.classList.add("list-view");
+              alert(
+                "Switched to list view. We would adjust the layout in a real application."
+              );
+            } else {
+              matchesView.classList.remove("list-view");
+            }
+          });
+        });
+
+        // Match actions
+        const likeButtons = document.querySelectorAll(".like-btn");
+        const dislikeButtons = document.querySelectorAll(".dislike-btn");
+        const superlikeButtons = document.querySelectorAll(".superlike-btn");
+
+        likeButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const matchCard = this.closest(".match-card");
+            const matchName =
+              matchCard.querySelector(".match-name").textContent;
+
+            this.textContent = "Liked!";
+            this.style.background = "#4CAF50";
+            this.disabled = true;
+
+            matchCard.querySelector(".dislike-btn").disabled = true;
+            matchCard.querySelector(".superlike-btn").disabled = true;
+
+            alert(
+              `You liked ${matchName}! If they like you back, it's a match!`
+            );
+          });
+        });
+
+        dislikeButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const matchCard = this.closest(".match-card");
+            const matchName =
+              matchCard.querySelector(".match-name").textContent;
+
+            matchCard.style.opacity = "0.5";
+            this.disabled = true;
+            matchCard.querySelector(".like-btn").disabled = true;
+            matchCard.querySelector(".superlike-btn").disabled = true;
+
+            alert(
+              `You passed on ${matchName}. They won't appear in your suggestions again.`
+            );
+          });
+        });
+
+        superlikeButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const matchCard = this.closest(".match-card");
+            const matchName =
+              matchCard.querySelector(".match-name").textContent;
+
+            this.textContent = "Super Liked!";
+            this.style.background = "#2196F3";
+            this.disabled = true;
+
+            matchCard.querySelector(".dislike-btn").disabled = true;
+            matchCard.querySelector(".like-btn").disabled = true;
+
+            alert(
+              `You Super Liked ${matchName}! They'll get a notification and see that you're really interested.`
+            );
+          });
+        });
+
+        // Pagination
+        const pageButtons = document.querySelectorAll(".page-btn");
+        pageButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            if (!this.classList.contains("active")) {
+              pageButtons.forEach((btn) => btn.classList.remove("active"));
+              this.classList.add("active");
+              alert("Loading page " + this.textContent + "...");
+            }
+          });
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector(".search-bar input");
+        searchInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            alert(
+              `Searching for: ${this.value}. We'll implement this in the next phase!`
+            );
+            this.value = "";
+          }
+        });
+
+        // Modal functionality
+        const matchModal = document.getElementById("matchModal");
+        const closeModal = document.getElementById("closeModal");
+
+        closeModal.addEventListener("click", function () {
+          matchModal.style.display = "none";
+        });
+
+        window.addEventListener("click", function (e) {
+          if (e.target === matchModal) {
+            matchModal.style.display = "none";
+          }
+        });
+
+        // Match card click for details (would open modal in real app)
+        const matchCards = document.querySelectorAll(".match-card");
+        matchCards.forEach((card) => {
+          card.addEventListener("click", function (e) {
+            // Don't trigger if clicking on buttons
+            if (!e.target.classList.contains("match-btn")) {
+              matchModal.style.display = "flex";
+            }
+          });
+        });
+      });
+    </script>
+
+    <script type="module">
+      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in - show appropriate navigation
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+              <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+              <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+              <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+          `;
+
+          // Add logout event listener
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        } else {
+          // User is not logged in
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
+              <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+              <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
+          `;
+        }
+      });
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>

@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - LoveConnect</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Profile-specific styles */
+      .profile-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+      }
+
+      .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .profile-title {
+        font-size: 2rem;
+        color: #333;
+      }
+
+      .profile-content {
+        display: flex;
+        gap: 2rem;
+      }
+
+      /* Profile Sidebar */
+      .profile-sidebar {
+        width: 300px;
+        flex-shrink: 0;
+      }
+
+      .profile-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+        border: 4px solid #e91e63;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .avatar-edit {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: #e91e63;
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .profile-avatar:hover .avatar-edit {
+        opacity: 1;
+      }
+
+      .profile-name {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      .profile-age {
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .profile-stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 1.5rem 0;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #e91e63;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .profile-bio {
+        text-align: left;
+        margin-bottom: 1.5rem;
+        color: #444;
+        line-height: 1.5;
+      }
+
+      /* Main Profile Content */
+      .profile-main {
+        flex: 1;
+      }
+
+      .profile-section {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+        color: #333;
+      }
+
+      .edit-toggle {
+        background: none;
+        border: none;
+        color: #e91e63;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Info Grid */
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .info-item {
+        margin-bottom: 1rem;
+      }
+
+      .info-label {
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+      }
+
+      .info-value {
+        color: #333;
+        font-size: 1.1rem;
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #444;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: #e91e63;
+        outline: none;
+      }
+
+      .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .cancel-btn {
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #ddd;
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .save-btn {
+        background: #e91e63;
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      /* Interests */
+      .interests-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+
+      .interest-tag {
+        background: #fce4ec;
+        color: #e91e63;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+
+      /* Photos */
+      .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+
+      .photo-item {
+        height: 150px;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+      }
+
+      .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+      }
+
+      .photo-item:hover img {
+        transform: scale(1.05);
+      }
+
+      .add-photo {
+        border: 2px dashed #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 2rem;
+      }
+
+      .add-photo:hover {
+        border-color: #e91e63;
+        color: #e91e63;
+      }
+
+      /* Read-only state */
+      .view-mode .form-group {
+        display: none;
+      }
+
+      .view-mode .info-item {
+        display: block;
+      }
+
+      /* Edit state */
+      .edit-mode .form-group {
+        display: block;
+      }
+
+      .edit-mode .info-item {
+        display: none;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 900px) {
+        .profile-content {
+          flex-direction: column;
+        }
+
+        .profile-sidebar {
+          width: 100%;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .profile-stats {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .photos-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .photo-item {
+          height: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <!-- For logged in state (browse, dashboard, profile) -->
+          <li class="nav-item">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="browse.html" class="nav-link">Browse</a>
+          </li>
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link">Messages</a>
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+      <div class="profile-header">
+        <h1 class="profile-title">My Profile</h1>
+        <a href="dashboard.html" class="btn-primary">Back to Dashboard</a>
+      </div>
+
+      <div class="profile-content">
+        <!-- Profile Sidebar -->
+        <div class="profile-sidebar">
+          <div class="profile-card">
+            <div class="profile-avatar">
+              <img src="https://placehold.co/150x150" alt="Profile Avatar" />
+              <div class="avatar-edit">✏️</div>
+            </div>
+            <h2 class="profile-name">John Doe</h2>
+            <p class="profile-age">28 years old</p>
+
+            <div class="profile-stats">
+              <div class="stat">
+                <div class="stat-number">245</div>
+                <div class="stat-label">Views</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number">42</div>
+                <div class="stat-label">Likes</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number">18</div>
+                <div class="stat-label">Matches</div>
+              </div>
+            </div>
+
+            <div class="profile-bio">
+              Adventure seeker, photography enthusiast, and coffee lover.
+              Looking for someone to explore the world with and create beautiful
+              memories.
+            </div>
+
+            <button class="btn-primary" style="width: 100%" id="previewProfile">
+              Preview My Profile
+            </button>
+          </div>
+
+          <div class="profile-card">
+            <h3>Profile Strength</h3>
+            <div class="profile-completion">
+              <div class="completion-text">
+                <span>Complete your profile</span>
+                <span>75%</span>
+              </div>
+              <div class="completion-bar">
+                <div class="completion-fill" style="width: 75%"></div>
+              </div>
+            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem">
+              Add more information and photos to increase your matches
+            </p>
+          </div>
+        </div>
+
+        <!-- Main Profile Content -->
+        <div class="profile-main">
+          <!-- Basic Information Section -->
+          <div class="profile-section view-mode" id="basicInfoSection">
+            <div class="section-header">
+              <h2 class="section-title">Basic Information</h2>
+              <button class="edit-toggle" data-section="basicInfoSection">
+                ✏️ Edit
+              </button>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Full Name</div>
+                <div class="info-value">John Doe</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Age</div>
+                <div class="info-value">28 years</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Gender</div>
+                <div class="info-value">Male</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Interested In</div>
+                <div class="info-value">Women</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">New York, NY</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Relationship Status</div>
+                <div class="info-value">Single</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" value="John Doe" />
+            </div>
+
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" value="28" min="18" max="100" />
+            </div>
+
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender">
+                <option value="male" selected>Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="interestedIn">Interested In</label>
+              <select id="interestedIn">
+                <option value="men">Men</option>
+                <option value="women" selected>Women</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" value="New York, NY" />
+            </div>
+
+            <div class="form-group">
+              <label for="relationshipStatus">Relationship Status</label>
+              <select id="relationshipStatus">
+                <option value="single" selected>Single</option>
+                <option value="divorced">Divorced</option>
+                <option value="widowed">Widowed</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button class="cancel-btn" data-section="basicInfoSection">
+                Cancel
+              </button>
+              <button class="save-btn" data-section="basicInfoSection">
+                Save Changes
+              </button>
+            </div>
+          </div>
+
+          <!-- About Me Section -->
+          <div class="profile-section view-mode" id="aboutSection">
+            <div class="section-header">
+              <h2 class="section-title">About Me</h2>
+              <button class="edit-toggle" data-section="aboutSection">
+                ✏️ Edit
+              </button>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Bio</div>
+              <div class="info-value">
+                Adventure seeker, photography enthusiast, and coffee lover.
+                Looking for someone to explore the world with and create
+                beautiful memories.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bio">Bio</label>
+              <textarea id="bio">
+Adventure seeker, photography enthusiast, and coffee lover. Looking for someone to explore the world with and create beautiful memories.</textarea
+              >
+            </div>
+
+            <div class="form-actions">
+              <button class="cancel-btn" data-section="aboutSection">
+                Cancel
+              </button>
+              <button class="save-btn" data-section="aboutSection">
+                Save Changes
+              </button>
+            </div>
+          </div>
+
+          <!-- Interests Section -->
+          <div class="profile-section view-mode" id="interestsSection">
+            <div class="section-header">
+              <h2 class="section-title">Interests</h2>
+              <button class="edit-toggle" data-section="interestsSection">
+                ✏️ Edit
+              </button>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">My Interests</div>
+              <div class="interests-list">
+                <span class="interest-tag">Photography</span>
+                <span class="interest-tag">Hiking</span>
+                <span class="interest-tag">Travel</span>
+                <span class="interest-tag">Coffee</span>
+                <span class="interest-tag">Movies</span>
+                <span class="interest-tag">Cooking</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="interests">Add Interests (separated by commas)</label>
+              <input
+                type="text"
+                id="interests"
+                value="Photography, Hiking, Travel, Coffee, Movies, Cooking"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button class="cancel-btn" data-section="interestsSection">
+                Cancel
+              </button>
+              <button class="save-btn" data-section="interestsSection">
+                Save Changes
+              </button>
+            </div>
+          </div>
+
+          <!-- Photos Section -->
+          <div class="profile-section">
+            <div class="section-header">
+              <h2 class="section-title">Photos</h2>
+            </div>
+
+            <div class="photos-grid">
+              <div class="photo-item">
+                <img src="https://placehold.co/150x150" alt="Profile Photo 1" />
+              </div>
+              <div class="photo-item">
+                <img src="https://placehold.co/150x150" alt="Profile Photo 2" />
+              </div>
+              <div class="photo-item">
+                <img src="https://placehold.co/150x150" alt="Profile Photo 3" />
+              </div>
+              <div class="photo-item">
+                <img src="https://placehold.co/150x150" alt="Profile Photo 4" />
+              </div>
+              <div class="photo-item add-photo">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import { profileAPI } from "./js/api.js";
+      import { showNotification } from "./js/utils.js";
+
+      // Check authentication
+      if (!requireAuth()) return;
+
+      let currentProfile = null;
+
+      // Load profile data
+      async function loadProfileData() {
+        try {
+          const profile = await profileAPI.getProfile();
+          currentProfile = profile;
+          populateProfileForm(profile);
+          updateProfileDisplay(profile);
+        } catch (error) {
+          showNotification("Error loading profile data", "error");
+        }
+      }
+
+      // Populate form with profile data
+      function populateProfileForm(profile) {
+        document.getElementById(
+          "fullName"
+        ).value = `${profile.firstName} ${profile.lastName}`;
+        document.getElementById("age").value = profile.age;
+        document.getElementById("gender").value = profile.gender;
+        document.getElementById("interestedIn").value = profile.interestedIn;
+        document.getElementById("location").value = profile.location;
+        document.getElementById("bio").value = profile.bio || "";
+        document.getElementById("interests").value = profile.interests
+          ? profile.interests.join(", ")
+          : "";
+
+        // Update interests display
+        if (profile.interests && profile.interests.length > 0) {
+          const interestsList = document.querySelector(".interests-list");
+          interestsList.innerHTML = "";
+          profile.interests.forEach((interest) => {
+            const tag = document.createElement("span");
+            tag.className = "interest-tag";
+            tag.textContent = interest;
+            interestsList.appendChild(tag);
+          });
+        }
+      }
+
+      // Update profile display
+      function updateProfileDisplay(profile) {
+        document.querySelector(
+          ".profile-name"
+        ).textContent = `${profile.firstName} ${profile.lastName}`;
+        document.querySelector(
+          ".profile-age"
+        ).textContent = `${profile.age} years old`;
+        document.querySelector(".profile-bio").textContent =
+          profile.bio || "No bio yet";
+
+        // Update completion percentage
+        const completionFill = document.querySelector(".completion-fill");
+        const completionText = document.querySelector(
+          ".completion-text span:last-child"
+        );
+        completionFill.style.width = `${profile.profileCompletion}%`;
+        completionText.textContent = `${profile.profileCompletion}%`;
+      }
+
+      // Save profile changes
+      async function saveProfile(section) {
+        try {
+          let updates = {};
+
+          if (section === "basicInfoSection") {
+            const nameParts = document
+              .getElementById("fullName")
+              .value.split(" ");
+            updates = {
+              firstName: nameParts[0],
+              lastName: nameParts.slice(1).join(" "),
+              age: parseInt(document.getElementById("age").value),
+              gender: document.getElementById("gender").value,
+              interestedIn: document.getElementById("interestedIn").value,
+              location: document.getElementById("location").value,
+            };
+          } else if (section === "aboutSection") {
+            updates = {
+              bio: document.getElementById("bio").value,
+            };
+          } else if (section === "interestsSection") {
+            const interests = document
+              .getElementById("interests")
+              .value.split(",")
+              .map((i) => i.trim())
+              .filter((i) => i.length > 0);
+            updates = {
+              interests: interests,
+            };
+          }
+
+          const updatedProfile = await profileAPI.updateProfile(updates);
+          currentProfile = updatedProfile;
+          updateProfileDisplay(updatedProfile);
+
+          showNotification("Profile updated successfully!", "success");
+          return true;
+        } catch (error) {
+          showNotification("Error updating profile", "error");
+          return false;
+        }
+      }
+
+      // Initialize profile page
+      document.addEventListener("DOMContentLoaded", function () {
+        loadProfileData();
+
+        // Edit toggle functionality
+        document.querySelectorAll(".edit-toggle").forEach((toggle) => {
+          toggle.addEventListener("click", function () {
+            const sectionId = this.getAttribute("data-section");
+            const section = document.getElementById(sectionId);
+            section.classList.toggle("view-mode");
+            section.classList.toggle("edit-mode");
+
+            if (section.classList.contains("edit-mode")) {
+              this.innerHTML = "👁️ View";
+            } else {
+              this.innerHTML = "✏️ Edit";
+            }
+          });
+        });
+
+        // Save button functionality
+        document.querySelectorAll(".save-btn").forEach((button) => {
+          button.addEventListener("click", async function () {
+            const sectionId = this.getAttribute("data-section");
+            const success = await saveProfile(sectionId);
+
+            if (success) {
+              const section = document.getElementById(sectionId);
+              section.classList.add("view-mode");
+              section.classList.remove("edit-mode");
+
+              const toggleButton = section.querySelector(".edit-toggle");
+              toggleButton.innerHTML = "✏️ Edit";
+            }
+          });
+        });
+
+        // Cancel button functionality
+        document.querySelectorAll(".cancel-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const sectionId = this.getAttribute("data-section");
+            const section = document.getElementById(sectionId);
+
+            // Reset form values
+            populateProfileForm(currentProfile);
+
+            section.classList.add("view-mode");
+            section.classList.remove("edit-mode");
+
+            const toggleButton = section.querySelector(".edit-toggle");
+            toggleButton.innerHTML = "✏️ Edit";
+
+            showNotification("Changes discarded", "info");
+          });
+        });
+
+        // Photo upload functionality
+        document
+          .querySelector(".avatar-edit")
+          .addEventListener("click", function () {
+            alert(
+              "Photo upload functionality will be implemented in the next phase"
+            );
+          });
+
+        document
+          .querySelector(".add-photo")
+          .addEventListener("click", function () {
+            alert(
+              "Photo upload functionality will be implemented in the next phase"
+            );
+          });
+      });
+    </script>
+
+    <script type="module">
+      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in - show appropriate navigation
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+              <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+              <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+              <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+          `;
+
+          // Add logout event listener
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        } else {
+          // User is not logged in
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
+              <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+              <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
+          `;
+        }
+      });
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - LoveConnect</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Dashboard-specific styles */
+      .dashboard-container {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        gap: 2rem;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 280px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        height: fit-content;
+      }
+
+      .user-profile {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .user-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 3px solid #e91e63;
+      }
+
+      .user-name {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+        color: #333;
+      }
+
+      .user-age {
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .profile-completion {
+        margin-bottom: 1.5rem;
+      }
+
+      .completion-text {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .completion-bar {
+        height: 8px;
+        background: #eee;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .completion-fill {
+        height: 100%;
+        background: #e91e63;
+        width: 75%; /* This would be dynamic in a real app */
+      }
+
+      .nav-menu-vertical {
+        list-style: none;
+      }
+
+      .nav-item-vertical {
+        margin-bottom: 0.8rem;
+      }
+
+      .nav-link-vertical {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem;
+        color: #444;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-link-vertical:hover {
+        background-color: #f9f9f9;
+      }
+
+      .nav-link-vertical.active {
+        background-color: #fce4ec;
+        color: #e91e63;
+        font-weight: 500;
+      }
+
+      .nav-icon {
+        margin-right: 0.8rem;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-title {
+        font-size: 1.8rem;
+        color: #333;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 0.5rem;
+        font-size: 1rem;
+        width: 250px;
+      }
+
+      /* Matches Section */
+      .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .view-all {
+        font-size: 0.9rem;
+        color: #e91e63;
+        text-decoration: none;
+      }
+
+      .matches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .match-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s;
+      }
+
+      .match-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .match-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .match-info {
+        padding: 1rem;
+      }
+
+      .match-name {
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+        color: #333;
+      }
+
+      .match-details {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      .match-actions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .match-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .like-btn {
+        background: #e91e63;
+        color: white;
+        border: none;
+      }
+
+      .like-btn:hover {
+        background: #d81b60;
+      }
+
+      .message-btn {
+        background: transparent;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+
+      .message-btn:hover {
+        border-color: #e91e63;
+        color: #e91e63;
+      }
+
+      /* Messages Preview */
+      .messages-preview {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+      }
+
+      .message-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .message-item:last-child {
+        border-bottom: none;
+      }
+
+      .message-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+      }
+
+      .message-content {
+        flex: 1;
+      }
+
+      .message-sender {
+        font-weight: 500;
+        margin-bottom: 0.2rem;
+        color: #333;
+      }
+
+      .message-text {
+        color: #666;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .message-time {
+        color: #999;
+        font-size: 0.8rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .dashboard-container {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+        }
+
+        .matches-grid {
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .search-bar {
+          width: 100%;
+        }
+
+        .search-bar input {
+          width: 100%;
+        }
+
+        .matches-grid {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+      }
+
+      .notification-badge {
+        background: #e91e63;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        margin-left: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <!-- For logged in state (browse, dashboard, profile) -->
+          <li class="nav-item">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="browse.html" class="nav-link">Browse</a>
+          </li>
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link">Messages</a>
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="user-profile">
+          <img
+            src="https://placehold.co/100x100"
+            alt="User Avatar"
+            class="user-avatar"
+          />
+          <h2 class="user-name">John Doe</h2>
+          <p class="user-age">28 years old</p>
+          <a
+            href="profile.html"
+            class="btn-primary"
+            style="display: inline-block; text-decoration: none"
+            >Edit Profile</a
+          >
+        </div>
+
+        <div class="profile-completion">
+          <div class="completion-text">
+            <span>Profile Strength</span>
+            <span>75%</span>
+          </div>
+          <div class="completion-bar">
+            <div class="completion-fill"></div>
+          </div>
+        </div>
+
+        <ul class="nav-menu-vertical">
+          <li class="nav-item-vertical">
+            <a href="dashboard.html" class="nav-link-vertical active">
+              <span class="nav-icon">🏠</span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item-vertical">
+            <a href="matches.html" class="nav-link-vertical">
+              <span class="nav-icon">💕</span>
+              <span>My Matches</span>
+            </a>
+          </li>
+          <li class="nav-item-vertical">
+            <a href="messages.html" class="nav-link-vertical">
+              <span class="nav-icon">💬</span>
+              <span>Messages</span>
+              <span class="notification-badge">3</span>
+            </a>
+          </li>
+          <li class="nav-item-vertical">
+            <a href="likes.html" class="nav-link-vertical">
+              <span class="nav-icon">👍</span>
+              <span>Likes</span>
+              <span class="notification-badge">12</span>
+            </a>
+          </li>
+          <li class="nav-item-vertical">
+            <a href="profile.html" class="nav-link-vertical">
+              <span class="nav-icon">👤</span>
+              <span>Profile</span>
+            </a>
+          </li>
+          <li class="nav-item-vertical">
+            <a href="settings.html" class="nav-link-vertical">
+              <span class="nav-icon">⚙️</span>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="dashboard-header">
+          <h1 class="dashboard-title">Welcome back, John!</h1>
+          <div class="search-bar">
+            <input type="text" placeholder="Search for matches..." />
+            <span>🔍</span>
+          </div>
+        </div>
+
+        <!-- New Matches Section -->
+        <div class="section">
+          <div class="section-title">
+            <h2>New Matches</h2>
+            <a href="browse.html" class="view-all">View all</a>
+          </div>
+
+          <div class="matches-grid">
+            <!-- Match 1 -->
+            <div class="match-card">
+              <img
+                src="https://placehold.co/300x200"
+                alt="Match Profile"
+                class="match-image"
+              />
+              <div class="match-info">
+                <h3 class="match-name">Sarah</h3>
+                <p class="match-details">25 • 5 miles away</p>
+                <div class="match-actions">
+                  <button class="match-btn like-btn">Like</button>
+                  <button class="match-btn message-btn">Message</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Match 2 -->
+            <div class="match-card">
+              <img
+                src="https://placehold.co/300x200"
+                alt="Match Profile"
+                class="match-image"
+              />
+              <div class="match-info">
+                <h3 class="match-name">Jessica</h3>
+                <p class="match-details">27 • 3 miles away</p>
+                <div class="match-actions">
+                  <button class="match-btn like-btn">Like</button>
+                  <button class="match-btn message-btn">Message</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Match 3 -->
+            <div class="match-card">
+              <img
+                src="https://placehold.co/300x200"
+                alt="Match Profile"
+                class="match-image"
+              />
+              <div class="match-info">
+                <h3 class="match-name">Emma</h3>
+                <p class="match-details">29 • 7 miles away</p>
+                <div class="match-actions">
+                  <button class="match-btn like-btn">Like</button>
+                  <button class="match-btn message-btn">Message</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Match 4 -->
+            <div class="match-card">
+              <img
+                src="https://placehold.co/300x200"
+                alt="Match Profile"
+                class="match-image"
+              />
+              <div class="match-info">
+                <h3 class="match-name">Olivia</h3>
+                <p class="match-details">26 • 2 miles away</p>
+                <div class="match-actions">
+                  <button class="match-btn like-btn">Like</button>
+                  <button class="match-btn message-btn">Message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Messages -->
+        <div class="section">
+          <div class="section-title">
+            <h2>Recent Messages</h2>
+            <a href="messages.html" class="view-all">View all</a>
+          </div>
+
+          <div class="messages-preview">
+            <!-- Message 1 -->
+            <div class="message-item">
+              <img
+                src="https://placehold.co/50x50"
+                alt="User Avatar"
+                class="message-avatar"
+              />
+              <div class="message-content">
+                <h4 class="message-sender">Sarah</h4>
+                <p class="message-text">
+                  Hey there! How are you doing today? I noticed we both love
+                  hiking...
+                </p>
+              </div>
+              <div class="message-time">2h ago</div>
+            </div>
+
+            <!-- Message 2 -->
+            <div class="message-item">
+              <img
+                src="https://placehold.co/50x50"
+                alt="User Avatar"
+                class="message-avatar"
+              />
+              <div class="message-content">
+                <h4 class="message-sender">Jessica</h4>
+                <p class="message-text">
+                  Thanks for liking my profile! I'd love to learn more about
+                  your...
+                </p>
+              </div>
+              <div class="message-time">5h ago</div>
+            </div>
+
+            <!-- Message 3 -->
+            <div class="message-item">
+              <img
+                src="https://placehold.co/50x50"
+                alt="User Avatar"
+                class="message-avatar"
+              />
+              <div class="message-content">
+                <h4 class="message-sender">Emma</h4>
+                <p class="message-text">
+                  Hi John! I saw that you're into photography too. What kind of
+                  camera...
+                </p>
+              </div>
+              <div class="message-time">1d ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { requireAuth, logout, getCurrentUser } from "./js/auth.js";
+      import { profileAPI, matchesAPI } from "./js/api.js";
+      import { showNotification } from "./js/utils.js";
+      import { initSocket } from "./js/socket.js";
+
+      // Check authentication
+      if (!requireAuth()) return;
+
+      // Initialize socket connection
+      initSocket();
+
+      // Load user data
+      async function loadUserData() {
+        try {
+          const profile = await profileAPI.getProfile();
+          updateProfileUI(profile);
+        } catch (error) {
+          showNotification("Error loading profile data", "error");
+        }
+      }
+
+      // Load matches
+      async function loadMatches() {
+        try {
+          const matches = await matchesAPI.getPotentialMatches();
+          displayMatches(matches);
+        } catch (error) {
+          showNotification("Error loading matches", "error");
+        }
+      }
+
+      // Update profile UI with data
+      function updateProfileUI(profile) {
+        document.querySelector(
+          ".user-name"
+        ).textContent = `${profile.firstName} ${profile.lastName}`;
+        document.querySelector(
+          ".user-age"
+        ).textContent = `${profile.age} years old`;
+        document.querySelector(".profile-bio").textContent =
+          profile.bio || "No bio yet";
+
+        // Update completion percentage
+        const completionFill = document.querySelector(".completion-fill");
+        const completionText = document.querySelector(
+          ".completion-text span:last-child"
+        );
+        completionFill.style.width = `${profile.profileCompletion}%`;
+        completionText.textContent = `${profile.profileCompletion}%`;
+      }
+
+      // Display matches in the grid
+      function displayMatches(matches) {
+        const matchesGrid = document.querySelector(".matches-grid");
+        matchesGrid.innerHTML = "";
+
+        if (matches.length === 0) {
+          matchesGrid.innerHTML =
+            '<p class="no-matches">No potential matches found. Try adjusting your filters!</p>';
+          return;
+        }
+
+        matches.forEach((match) => {
+          const matchCard = document.createElement("div");
+          matchCard.className = "match-card";
+          matchCard.innerHTML = `
+                  <img src="${
+                    match.photos[0] || "https://placehold.co/300x200"
+                  }" alt="${match.firstName}" class="match-image">
+                  <div class="match-overlay">
+                      <h3 class="match-name">${match.firstName}</h3>
+                      <div class="match-age">${match.age} • ${
+            match.location
+          }</div>
+                  </div>
+                  <div class="match-info">
+                      <div class="match-details">
+                          <div class="match-detail">📍 ${
+                            Math.floor(Math.random() * 10) + 1
+                          } miles away</div>
+                          <div class="match-detail">⭐ ${
+                            Math.floor(Math.random() * 20) + 80
+                          }% match</div>
+                      </div>
+                      <p class="match-bio">${
+                        match.bio || "No bio available"
+                      }</p>
+                      <div class="match-interests">
+                          ${
+                            match.interests &&
+                            match.interests
+                              .slice(0, 3)
+                              .map(
+                                (interest) =>
+                                  `<span class="match-interest">${interest}</span>`
+                              )
+                              .join("")
+                          }
+                      </div>
+                      <div class="match-actions">
+                          <button class="match-btn dislike-btn" data-user-id="${
+                            match.user._id
+                          }">Pass</button>
+                          <button class="match-btn like-btn" data-user-id="${
+                            match.user._id
+                          }">Like</button>
+                          <button class="match-btn superlike-btn" data-user-id="${
+                            match.user._id
+                          }">Super Like</button>
+                      </div>
+                  </div>
+              `;
+          matchesGrid.appendChild(matchCard);
+        });
+
+        // Add event listeners to buttons
+        addMatchEventListeners();
+      }
+
+      // Add event listeners to match action buttons
+      function addMatchEventListeners() {
+        document.querySelectorAll(".like-btn").forEach((button) => {
+          button.addEventListener("click", async function () {
+            const userId = this.getAttribute("data-user-id");
+            await handleMatchAction(userId, "like");
+          });
+        });
+
+        document.querySelectorAll(".dislike-btn").forEach((button) => {
+          button.addEventListener("click", async function () {
+            const userId = this.getAttribute("data-user-id");
+            await handleMatchAction(userId, "pass");
+          });
+        });
+      }
+
+      // Handle match actions (like/pass)
+      async function handleMatchAction(targetUserId, action) {
+        try {
+          let response;
+          if (action === "like") {
+            response = await matchesAPI.likeProfile(targetUserId);
+          } else {
+            response = await matchesAPI.passProfile(targetUserId);
+          }
+
+          if (response.match) {
+            showNotification(
+              "It's a match! You can now message each other.",
+              "success"
+            );
+          } else {
+            showNotification(
+              action === "like" ? "Like sent!" : "Profile passed",
+              "info"
+            );
+          }
+
+          // Reload matches
+          loadMatches();
+        } catch (error) {
+          showNotification("Error processing match action", "error");
+        }
+      }
+
+      // Initialize dashboard
+      document.addEventListener("DOMContentLoaded", function () {
+        loadUserData();
+        loadMatches();
+
+        // Logout functionality
+        document.querySelector(".logout-btn").addEventListener("click", logout);
+      });
+    </script>
+
+    <script type="module">
+      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in - show appropriate navigation
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+              <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+              <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+              <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+          `;
+
+          // Add logout event listener
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        } else {
+          // User is not logged in
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
+              <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+              <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
+          `;
+        }
+      });
+
+      // Add this to your existing dashboard script
+      import { initSocket } from "./js/socket.js";
+
+      // Initialize socket for notifications
+      const socket = initSocket();
+
+      if (socket) {
+        socket.on("receive-message", (message) => {
+          // Show notification for new messages
+          if (message.sender._id !== currentUser.id) {
+            showNotification(
+              `New message from ${message.sender.email}`,
+              "info"
+            );
+            updateUnreadCounts();
+          }
+        });
+
+        socket.on("messages-read", (data) => {
+          // Handle read receipts
+          console.log("Messages were read by:", data.readerId);
+        });
+      }
+
+      // Function to update unread counts
+      async function updateUnreadCounts() {
+        try {
+          const conversations = await messagesAPI.getConversations();
+          const totalUnread = conversations.reduce(
+            (sum, convo) => sum + convo.unreadCount,
+            0
+          );
+
+          // Update UI with unread count
+          const messageBadge = document.querySelector(
+            '.nav-link[href="messages.html"] .notification-badge'
+          );
+          if (totalUnread > 0) {
+            messageBadge.textContent = totalUnread;
+            messageBadge.style.display = "flex";
+          } else {
+            messageBadge.style.display = "none";
+          }
+        } catch (error) {
+          console.error("Error updating unread counts:", error);
+        }
+      }
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>

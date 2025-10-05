@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoveConnect - Find Your Perfect Match</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="#" class="nav-link">Home</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">How it Works</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">Success Stories</a>
+          </li>
+          <!-- For logged out state (index, login, signup) -->
+          <li class="nav-item">
+            <a href="login.html" class="nav-link login-btn">Login</a>
+          </li>
+          <li class="nav-item">
+            <a href="signup.html" class="nav-link signup-btn">Sign Up</a>
+          </li>
+
+          <!-- For logged in state (dashboard) -->
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link"
+              >Messages <span class="notification-badge">3</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Find Your Perfect Match Today</h1>
+        <p>
+          Join thousands of singles finding love through our intelligent
+          matching system
+        </p>
+        <div class="hero-buttons">
+          <button class="btn-primary">Create Profile</button>
+          <button class="btn-secondary">Take a Tour</button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="profile-card preview-card-1">
+          <img src="https://placehold.co/150x150" alt="Profile preview" />
+          <h3>Sarah, 28</h3>
+          <p>Photographer</p>
+        </div>
+        <div class="profile-card preview-card-2">
+          <img src="https://placehold.co/150x150" alt="Profile preview" />
+          <h3>Mike, 32</h3>
+          <p>Software Engineer</p>
+        </div>
+        <div class="profile-card preview-card-3">
+          <img src="https://placehold.co/150x150" alt="Profile preview" />
+          <h3>Jessica, 26</h3>
+          <p>Teacher</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <h2>How LoveConnect Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Create Your Profile</h3>
+          <p>Tell us about yourself and what you're looking for in a partner</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Find Matches</h3>
+          <p>Our algorithm connects you with compatible singles in your area</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Start Conversations</h3>
+          <p>
+            Break the ice with our conversation starters and messaging tools
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script type="module">
+      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in - show appropriate navigation
+          navMenu.innerHTML = `
+                  <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                  <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+                  <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+                  <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+                  <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+              `;
+
+          // Add logout event listener
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        } else {
+          // User is not logged in
+          navMenu.innerHTML = `
+                  <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                  <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+                  <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
+                  <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
+                  <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+                  <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
+              `;
+        }
+      });
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - LoveConnect</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Signup-specific styles */
+      .signup-container {
+        display: flex;
+        min-height: calc(100vh - 200px);
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background-color: #f8f9fa;
+      }
+
+      .signup-box {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        padding: 2.5rem;
+        text-align: center;
+      }
+
+      .signup-logo {
+        color: #e91e63;
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+      }
+
+      .signup-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      .signup-subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+      }
+
+      .signup-form {
+        text-align: left;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        flex: 1;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #444;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: #e91e63;
+        outline: none;
+      }
+
+      .password-strength {
+        margin-top: 0.5rem;
+        height: 5px;
+        background: #eee;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .strength-meter {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s, background-color 0.3s;
+      }
+
+      .terms {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        text-align: left;
+      }
+
+      .terms input {
+        margin-top: 0.3rem;
+        margin-right: 0.5rem;
+      }
+
+      .terms label {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .terms a {
+        color: #e91e63;
+        text-decoration: none;
+      }
+
+      .terms a:hover {
+        text-decoration: underline;
+      }
+
+      .signup-button {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: #e91e63;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .signup-button:hover {
+        background-color: #d81b60;
+      }
+
+      .divider {
+        margin: 1.5rem 0;
+        height: 1px;
+        background-color: #eee;
+        position: relative;
+      }
+
+      .divider span {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 1rem;
+        color: #777;
+        font-size: 0.9rem;
+      }
+
+      .social-signup {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .social-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .social-btn:hover {
+        background: #eee;
+      }
+
+      .login-link {
+        margin-top: 1.5rem;
+        color: #666;
+      }
+
+      .login-link a {
+        color: #e91e63;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 600px) {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .signup-box {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar (same as index.html) -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="index.html" class="nav-link">Home</a>
+          </li>
+          <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">How it Works</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">Success Stories</a>
+          </li>
+          <!-- For logged out state (index, login, signup) -->
+          <li class="nav-item">
+            <a href="login.html" class="nav-link login-btn">Login</a>
+          </li>
+          <li class="nav-item">
+            <a href="signup.html" class="nav-link signup-btn">Sign Up</a>
+          </li>
+
+          <!-- For logged in state (dashboard) -->
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link"
+              >Messages <span class="notification-badge">3</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Signup Section -->
+    <section class="signup-container">
+      <div class="signup-box">
+        <div class="signup-logo">LoveConnect</div>
+        <h2 class="signup-title">Create Your Account</h2>
+        <p class="signup-subtitle">
+          Join our community and find your perfect match
+        </p>
+
+        <form class="signup-form" id="signupForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Create a strong password"
+              required
+            />
+            <div class="password-strength">
+              <div class="strength-meter" id="passwordStrength"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="gender">I am</label>
+              <select id="gender" required>
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="interestedIn">Interested In</label>
+              <select id="interestedIn" required>
+                <option value="">Select preference</option>
+                <option value="male">Men</option>
+                <option value="female">Women</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="birthdate">Date of Birth</label>
+            <input type="date" id="birthdate" required />
+          </div>
+
+          <div class="terms">
+            <input type="checkbox" id="terms" required />
+            <label for="terms"
+              >I agree to the <a href="#">Terms of Service</a> and
+              <a href="#">Privacy Policy</a>. I confirm that I am 18 years of
+              age or older.</label
+            >
+          </div>
+
+          <button type="submit" class="signup-button">Create Account</button>
+        </form>
+
+        <div class="divider"><span>Or sign up with</span></div>
+
+        <div class="social-signup">
+          <div class="social-btn">FB</div>
+          <div class="social-btn">G</div>
+          <div class="social-btn">IN</div>
+        </div>
+
+        <div class="login-link">
+          Already have an account? <a href="login.html">Log in here</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer (same as index.html) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { register, redirectIfLoggedIn } from "./js/auth.js";
+      import {
+        showNotification,
+        validateEmail,
+        validatePassword,
+      } from "./js/utils.js";
+
+      // Redirect if already logged in
+      if (redirectIfLoggedIn()) {
+        window.location.href = "dashboard.html";
+      }
+
+      // Password strength indicator
+      const passwordInput = document.getElementById("password");
+      const strengthMeter = document.getElementById("passwordStrength");
+
+      passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+        const error = validatePassword(password);
+
+        if (error) {
+          strengthMeter.style.width = "33%";
+          strengthMeter.style.backgroundColor = "#e74c3c";
+        } else if (password.length < 8) {
+          strengthMeter.style.width = "66%";
+          strengthMeter.style.backgroundColor = "#f39c12";
+        } else {
+          strengthMeter.style.width = "100%";
+          strengthMeter.style.backgroundColor = "#2ecc71";
+        }
+      });
+
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const formData = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            age: parseInt(document.getElementById("age").value),
+            gender: document.getElementById("gender").value,
+            interestedIn: document.getElementById("interestedIn").value,
+            location: document.getElementById("location").value,
+          };
+
+          // Validate form data
+          if (!validateEmail(formData.email)) {
+            showNotification("Please enter a valid email address", "error");
+            return;
+          }
+
+          const passwordError = validatePassword(formData.password);
+          if (passwordError) {
+            showNotification(passwordError, "error");
+            return;
+          }
+
+          if (formData.age < 18) {
+            showNotification(
+              "You must be at least 18 years old to register",
+              "error"
+            );
+            return;
+          }
+
+          // Show loading state
+          const signupButton = this.querySelector('button[type="submit"]');
+          const originalText = signupButton.textContent;
+          signupButton.textContent = "Creating account...";
+          signupButton.disabled = true;
+
+          try {
+            const result = await register(formData);
+
+            if (result.success) {
+              showNotification(
+                "Account created successfully! Redirecting...",
+                "success"
+              );
+              setTimeout(() => {
+                window.location.href = "profile.html";
+              }, 1000);
+            } else {
+              showNotification(result.error, "error");
+              signupButton.textContent = originalText;
+              signupButton.disabled = false;
+            }
+          } catch (error) {
+            showNotification("An error occurred during registration", "error");
+            signupButton.textContent = originalText;
+            signupButton.disabled = false;
+          }
+        });
+
+      // Set max date for birthdate to ensure 18+ only
+      window.addEventListener("load", function () {
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setFullYear(today.getFullYear() - 18);
+        document
+          .getElementById("birthdate")
+          .setAttribute("max", maxDate.toISOString().split("T")[0]);
+      });
+    </script>
+
+    <script type="module">
+      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in - show appropriate navigation
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+              <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+              <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+              <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+          `;
+
+          // Add logout event listener
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        } else {
+          // User is not logged in
+          navMenu.innerHTML = `
+              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
+              <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+              <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
+          `;
+        }
+      });
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>

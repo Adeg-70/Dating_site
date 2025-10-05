@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages - LoveConnect</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Messages-specific styles */
+      .messages-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 2rem auto;
+        height: calc(100vh - 200px);
+        padding: 0 2rem;
+        gap: 2rem;
+      }
+
+      /* Conversations sidebar */
+      .conversations-sidebar {
+        width: 350px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .conversations-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .conversations-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+      }
+
+      .conversations-search {
+        position: relative;
+      }
+
+      .conversations-search input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.5rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+
+      .conversations-search::before {
+        content: "🔍";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+
+      .conversations-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .conversation-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        border-bottom: 1px solid #f5f5f5;
+      }
+
+      .conversation-item:hover {
+        background-color: #f9f9f9;
+      }
+
+      .conversation-item.active {
+        background-color: #fce4ec;
+      }
+
+      .conversation-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+        flex-shrink: 0;
+      }
+
+      .conversation-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .conversation-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.3rem;
+      }
+
+      .conversation-name {
+        font-weight: 500;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .conversation-time {
+        font-size: 0.8rem;
+        color: #999;
+        flex-shrink: 0;
+      }
+
+      .conversation-preview {
+        font-size: 0.9rem;
+        color: #666;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .conversation-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.3rem;
+        margin-left: 1rem;
+      }
+
+      .unread-count {
+        background: #e91e63;
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+      }
+
+      .online-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #4caf50;
+      }
+
+      /* Chat main area */
+      .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      .chat-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .chat-user {
+        display: flex;
+        align-items: center;
+        flex: 1;
+      }
+
+      .chat-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+      }
+
+      .chat-user-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.2rem;
+        color: #333;
+      }
+
+      .chat-user-info p {
+        font-size: 0.8rem;
+        color: #4caf50;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .chat-actions {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .chat-action-btn {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 1.2rem;
+      }
+
+      .chat-action-btn:hover {
+        color: #e91e63;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .message {
+        display: flex;
+        max-width: 70%;
+      }
+
+      .message.received {
+        align-self: flex-start;
+      }
+
+      .message.sent {
+        align-self: flex-end;
+      }
+
+      .message-content {
+        padding: 0.8rem 1rem;
+        border-radius: 18px;
+        position: relative;
+      }
+
+      .message.received .message-content {
+        background: #f0f0f0;
+        border-top-left-radius: 4px;
+      }
+
+      .message.sent .message-content {
+        background: #e91e63;
+        color: white;
+        border-top-right-radius: 4px;
+      }
+
+      .message-time {
+        font-size: 0.7rem;
+        color: #999;
+        margin-top: 0.3rem;
+        text-align: right;
+      }
+
+      .message.sent .message-time {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .chat-input-container {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #eee;
+      }
+
+      .chat-input {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .chat-input textarea {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        resize: none;
+        height: 45px;
+        font-family: inherit;
+        font-size: 0.9rem;
+      }
+
+      .chat-input textarea:focus {
+        outline: none;
+        border-color: #e91e63;
+      }
+
+      .chat-input-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .input-action-btn {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 1.2rem;
+      }
+
+      .input-action-btn:hover {
+        color: #e91e63;
+      }
+
+      .send-btn {
+        background: #e91e63;
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .send-btn:hover {
+        background: #d81b60;
+      }
+
+      .no-conversation {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .no-conversation-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ddd;
+      }
+
+      .no-conversation h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      .no-conversation p {
+        max-width: 400px;
+        line-height: 1.5;
+      }
+
+      /* File message styles */
+      .file-message .message-content {
+        max-width: 300px;
+      }
+
+      .message-attachment {
+        margin: 8px 0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .image-attachment {
+        max-width: 100%;
+      }
+
+      .image-attachment .image-link {
+        display: block;
+      }
+
+      .attachment-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .attachment-image:hover {
+        transform: scale(1.02);
+      }
+
+      .file-attachment {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 8px;
+      }
+
+      .file-download {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .file-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .file-name {
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .file-size {
+        font-size: 0.8em;
+        color: #666;
+      }
+
+      .download-btn {
+        padding: 8px;
+        border-radius: 4px;
+        background: #e91e63;
+        color: white;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+
+      .download-btn:hover {
+        background: #d81b60;
+      }
+
+      /* File preview styles */
+      .file-previews {
+        padding: 8px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-top: 8px;
+      }
+
+      .file-preview {
+        margin-bottom: 8px;
+        padding: 8px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #eee;
+      }
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .file-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .remove-file {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #999;
+        padding: 4px;
+      }
+
+      .remove-file:hover {
+        color: #e91e63;
+      }
+
+      .image-preview {
+        margin-top: 8px;
+      }
+
+      .image-preview img {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: 4px;
+      }
+
+      /* Upload progress */
+      .upload-progress {
+        height: 4px;
+        background: #eee;
+        border-radius: 2px;
+        margin-top: 4px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: #e91e63;
+        transition: width 0.3s;
+      }
+
+      /* Upload Progress Styles */
+      .upload-progress-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .upload-progress-container.minimized {
+        height: 40px;
+        overflow: hidden;
+      }
+
+      .upload-progress-container.minimized .progress-items {
+        display: none;
+      }
+
+      .progress-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9f9f9;
+        border-radius: 12px 12px 0 0;
+      }
+
+      .progress-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .minimize-progress {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 4px;
+        color: #666;
+      }
+
+      .progress-items {
+        padding: 8px;
+      }
+
+      .upload-progress-item {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .upload-progress-item:last-child {
+        border-bottom: none;
+      }
+
+      .progress-file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .progress-file-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .progress-file-name {
+        font-weight: 500;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .progress-file-size {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .cancel-upload {
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px;
+        color: #999;
+      }
+
+      .cancel-upload:hover {
+        color: #e91e63;
+      }
+
+      .progress-bar-container {
+        height: 6px;
+        background: #f0f0f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 4px;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #e91e63, #ff4081);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+
+      .upload-status {
+        font-size: 11px;
+        color: #666;
+      }
+
+      /* In-message upload progress */
+      .uploading-attachment {
+        background: #f9f9f9;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 8px 0;
+      }
+
+      .upload-file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .upload-file-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .upload-progress {
+        height: 4px;
+        background: #eee;
+        border-radius: 2px;
+        margin: 4px 0;
+        overflow: hidden;
+      }
+
+      .message.uploading .message-content {
+        opacity: 0.8;
+      }
+
+      .message.upload-failed .message-content {
+        opacity: 0.6;
+      }
+
+      /* Speed and time remaining formatting */
+      .upload-speed {
+        font-size: 11px;
+        color: #666;
+        margin-top: 2px;
+      }
+
+      /* Animation for progress bars */
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .uploading .progress-bar {
+        animation: pulse 2s infinite;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 900px) {
+        .messages-container {
+          flex-direction: column;
+          height: auto;
+        }
+
+        .conversations-sidebar {
+          width: 100%;
+          height: 300px;
+        }
+
+        .chat-main {
+          height: 500px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .messages-container {
+          padding: 0 1rem;
+        }
+
+        .conversations-header {
+          padding: 1rem;
+        }
+
+        .conversation-item {
+          padding: 0.8rem 1rem;
+        }
+
+        .chat-header {
+          padding: 1rem;
+        }
+
+        .chat-messages {
+          padding: 1rem;
+        }
+
+        .message {
+          max-width: 85%;
+        }
+
+        .chat-input-container {
+          padding: 1rem;
+        }
+      }
+
+      /* Typing indicator */
+      .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.5rem 1rem;
+        background: #f0f0f0;
+        border-radius: 18px;
+        align-self: flex-start;
+        max-width: fit-content;
+        margin-bottom: 0.5rem;
+      }
+
+      .typing-dot {
+        width: 6px;
+        height: 6px;
+        background: #999;
+        border-radius: 50%;
+        animation: typingAnimation 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typingAnimation {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-5px);
+        }
+      }
+
+      /* Typing indicator styles */
+      .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 12px 16px;
+        background: #f0f0f0;
+        border-radius: 18px;
+        margin: 8px 0;
+        max-width: fit-content;
+      }
+
+      .typing-dot {
+        width: 6px;
+        height: 6px;
+        background: #999;
+        border-radius: 50%;
+        animation: typing-bounce 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing-bounce {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-4px);
+        }
+      }
+
+      /* No conversations state */
+      .no-conversations {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .no-conversations p:first-child {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Message status indicators */
+      .message-sent .message-status {
+        font-size: 0.7rem;
+        margin-top: 2px;
+        text-align: right;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .message-received .message-status {
+        font-size: 0.7rem;
+        margin-top: 2px;
+        text-align: right;
+        color: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Online status in chat header */
+      .chat-user-info p {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .online-dot {
+        width: 8px;
+        height: 8px;
+        background: #4caf50;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">LoveConnect</div>
+        <ul class="nav-menu">
+          <!-- For logged in state (messages, dashboard, profile, browse) -->
+          <li class="nav-item">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="browse.html" class="nav-link">Browse</a>
+          </li>
+          <li class="nav-item">
+            <a href="messages.html" class="nav-link">Messages</a>
+          </li>
+          <li class="nav-item">
+            <a href="profile.html" class="nav-link">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link login-btn">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Messages Content -->
+    <div class="messages-container">
+      <!-- Conversations Sidebar -->
+      <div class="conversations-sidebar">
+        <div class="conversations-header">
+          <h2 class="conversations-title">Messages</h2>
+          <div class="conversations-search">
+            <input type="text" placeholder="Search conversations..." />
+          </div>
+        </div>
+
+        <div class="conversations-list">
+          <!-- Conversation 1 -->
+          <div class="conversation-item active" data-user="sarah">
+            <img
+              src="https://placehold.co/50x50"
+              alt="Sarah"
+              class="conversation-avatar"
+            />
+            <div class="conversation-info">
+              <div class="conversation-top">
+                <div class="conversation-name">Sarah</div>
+                <div class="conversation-time">10:42 AM</div>
+              </div>
+              <div class="conversation-preview">Hey! How was your weekend?</div>
+            </div>
+            <div class="conversation-meta">
+              <div class="online-status"></div>
+              <div class="unread-count">3</div>
+            </div>
+          </div>
+
+          <!-- Conversation 2 -->
+          <div class="conversation-item" data-user="jessica">
+            <img
+              src="https://placehold.co/50x50"
+              alt="Jessica"
+              class="conversation-avatar"
+            />
+            <div class="conversation-info">
+              <div class="conversation-top">
+                <div class="conversation-name">Jessica</div>
+                <div class="conversation-time">Yesterday</div>
+              </div>
+              <div class="conversation-preview">
+                I'd love to check out that new coffee shop!
+              </div>
+            </div>
+            <div class="conversation-meta">
+              <div class="unread-count">1</div>
+            </div>
+          </div>
+
+          <!-- Conversation 3 -->
+          <div class="conversation-item" data-user="emma">
+            <img
+              src="https://placehold.co/50x50"
+              alt="Emma"
+              class="conversation-avatar"
+            />
+            <div class="conversation-info">
+              <div class="conversation-top">
+                <div class="conversation-name">Emma</div>
+                <div class="conversation-time">Wednesday</div>
+              </div>
+              <div class="conversation-preview">
+                Thanks for the restaurant recommendation!
+              </div>
+            </div>
+          </div>
+
+          <!-- Conversation 4 -->
+          <div class="conversation-item" data-user="olivia">
+            <img
+              src="https://placehold.co/50x50"
+              alt="Olivia"
+              class="conversation-avatar"
+            />
+            <div class="conversation-info">
+              <div class="conversation-top">
+                <div class="conversation-name">Olivia</div>
+                <div class="conversation-time">Monday</div>
+              </div>
+              <div class="conversation-preview">
+                Looking forward to our hike this weekend!
+              </div>
+            </div>
+            <div class="conversation-meta">
+              <div class="online-status"></div>
+            </div>
+          </div>
+
+          <!-- Conversation 5 -->
+          <div class="conversation-item" data-user="sophia">
+            <img
+              src="https://placehold.co/50x50"
+              alt="Sophia"
+              class="conversation-avatar"
+            />
+            <div class="conversation-info">
+              <div class="conversation-top">
+                <div class="conversation-name">Sophia</div>
+                <div class="conversation-time">Jan 15</div>
+              </div>
+              <div class="conversation-preview">
+                Did you watch the latest episode?
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        <!-- Chat with active conversation -->
+        <div class="chat-active">
+          <div class="chat-header">
+            <div class="chat-user">
+              <img
+                src="https://placehold.co/40x40"
+                alt="Sarah"
+                class="chat-user-avatar"
+              />
+              <div class="chat-user-info">
+                <h3>Sarah</h3>
+                <p>Online now</p>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button class="chat-action-btn">📞</button>
+              <button class="chat-action-btn">⋮</button>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+            <!-- Received message -->
+            <div class="message received">
+              <div class="message-content">
+                <p>Hey there! How was your weekend?</p>
+                <div class="message-time">10:30 AM</div>
+              </div>
+            </div>
+
+            <!-- Sent message -->
+            <div class="message sent">
+              <div class="message-content">
+                <p>
+                  It was great! I went hiking at Blue Mountain. How about you?
+                </p>
+                <div class="message-time">10:32 AM</div>
+              </div>
+            </div>
+
+            <!-- Received message -->
+            <div class="message received">
+              <div class="message-content">
+                <p>
+                  That sounds amazing! I spent the weekend trying out new coffee
+                  shops downtown. I found this great place with the best latte
+                  art!
+                </p>
+                <div class="message-time">10:35 AM</div>
+              </div>
+            </div>
+
+            <!-- Sent message -->
+            <div class="message sent">
+              <div class="message-content">
+                <p>
+                  Oh nice! I'm always looking for good coffee places. What's it
+                  called?
+                </p>
+                <div class="message-time">10:36 AM</div>
+              </div>
+            </div>
+
+            <!-- Received message -->
+            <div class="message received">
+              <div class="message-content">
+                <p>
+                  It's called "Brew Haven". We should check it out together
+                  sometime!
+                </p>
+                <div class="message-time">10:38 AM</div>
+              </div>
+            </div>
+
+            <!-- Sent message -->
+            <div class="message sent">
+              <div class="message-content">
+                <p>I'd love that! How about this weekend?</p>
+                <div class="message-time">10:40 AM</div>
+              </div>
+            </div>
+
+            <!-- Typing indicator -->
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="chat-input">
+              <textarea
+                placeholder="Type a message..."
+                id="messageInput"
+              ></textarea>
+              <div class="chat-input-actions">
+                <button class="input-action-btn">😊</button>
+                <button class="input-action-btn">📷</button>
+                <button class="input-action-btn">🎁</button>
+              </div>
+              <button class="send-btn" id="sendMessage">➤</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No conversation selected (initially hidden) -->
+        <div class="no-conversation" style="display: none">
+          <div class="no-conversation-icon">💬</div>
+          <h3>Your messages</h3>
+          <p>
+            Select a conversation from the list to start chatting, or find new
+            matches in the browse section.
+          </p>
+          <a
+            href="browse.html"
+            class="btn-primary"
+            style="margin-top: 1rem; text-decoration: none"
+            >Browse Matches</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Add file upload input (hidden) -->
+    <input
+      type="file"
+      id="fileInput"
+      multiple
+      accept="image/*,.pdf,.doc,.docx,.txt"
+      style="display: none"
+    />
+
+    <!-- Update chat input container -->
+    <div class="chat-input-container">
+      <div class="chat-input">
+        <!-- File upload button -->
+        <button class="input-action-btn" id="attachFiles" title="Attach files">
+          📎
+        </button>
+
+        <textarea placeholder="Type a message..." id="messageInput"></textarea>
+
+        <div class="chat-input-actions">
+          <button class="input-action-btn">😊</button>
+          <button class="send-btn" id="sendMessage">➤</button>
+        </div>
+      </div>
+
+      <!-- File preview area -->
+      <div class="file-previews" id="filePreviews" style="display: none"></div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>LoveConnect</h3>
+          <p>Helping people find meaningful connections since 2023</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Safety Tips</a></li>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { requireAuth, getCurrentUser } from "./js/auth.js";
+      import { messagesAPI } from "./js/api.js";
+      import { showNotification, formatDate } from "./js/utils.js";
+      import { conversationService } from "./js/conversation.js";
+
+      // Add these imports
+      import { fileUploader } from "./js/fileUpload.js";
+      import { fileMessageUI } from "./js/ui/fileMessage.js";
+
+      // Add these imports
+      import { progressUI } from "./js/ui/progressUI.js";
+
+      // Add these variables
+      let uploadSpeedTracker = {
+        lastUpdate: Date.now(),
+        lastLoaded: 0,
+        speeds: [],
+      };
+
+      // Add these functions
+      function setupProgressTracking() {
+        // Listen for cancel events
+        document.addEventListener("cancelUpload", (e) => {
+          const { uploadId } = e.detail;
+          fileUploader.cancelUpload(uploadId);
+        });
+
+        // Track upload speed
+        setInterval(() => {
+          const now = Date.now();
+          const elapsed = (now - uploadSpeedTracker.lastUpdate) / 1000;
+
+          if (elapsed > 0) {
+            const currentSpeed =
+              (uploadSpeedTracker.lastLoaded - uploadSpeedTracker.lastLoaded) /
+              elapsed;
+            uploadSpeedTracker.speeds.push(currentSpeed);
+
+            // Keep only last 10 readings
+            if (uploadSpeedTracker.speeds.length > 10) {
+              uploadSpeedTracker.speeds.shift();
+            }
+          }
+
+          uploadSpeedTracker.lastUpdate = now;
+        }, 1000);
+      }
+
+      function handleFileUploadWithProgress(files, content) {
+        const uploadId = `msg_${Date.now()}`;
+
+        // Show uploading message in chat
+        const uploadingMessage = fileMessageUI.createUploadingMessage(
+          uploadId,
+          files,
+          content
+        );
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.appendChild(uploadingMessage);
+        scrollToBottom();
+
+        // Show in progress container
+        files.forEach((file) => {
+          progressUI.addUploadToProgress(uploadId, file.name);
+        });
+
+        // Start upload with progress tracking
+        const uploadResult = fileUploader.uploadFiles(
+          files,
+          "/api/messages/send",
+          (id, progress, uploadedFiles) => {
+            // Calculate speed and time remaining
+            const totalSize = uploadedFiles.reduce(
+              (sum, file) => sum + file.size,
+              0
+            );
+            const loaded = (progress / 100) * totalSize;
+            const { speed, timeRemaining } = progressUI.calculateSpeedAndTime(
+              uploadSpeedTracker.lastUpdate,
+              loaded,
+              totalSize
+            );
+
+            // Update progress everywhere
+            progressUI.updateProgressBar(
+              uploadId,
+              progress,
+              speed,
+              timeRemaining
+            );
+            fileMessageUI.updateUploadProgress(
+              uploadId,
+              progress,
+              speed,
+              timeRemaining
+            );
+
+            uploadSpeedTracker.lastLoaded = loaded;
+          },
+          (id, result, error) => {
+            if (error) {
+              progressUI.completeProgressBar(uploadId, false);
+              fileMessageUI.completeUpload(uploadId, false);
+              showNotification("Upload failed", "error");
+            } else {
+              progressUI.completeProgressBar(uploadId, true);
+              fileMessageUI.completeUpload(uploadId, true, result);
+              showNotification("Files sent successfully", "success");
+            }
+          }
+        );
+
+        return uploadResult;
+      }
+
+      // Add these variables
+      let selectedFiles = [];
+
+      // Add these functions to your existing code
+      function setupFileUpload() {
+        const fileInput = document.getElementById("fileInput");
+        const attachButton = document.getElementById("attachFiles");
+        const filePreviews = document.getElementById("filePreviews");
+
+        // Open file dialog when attach button is clicked
+        attachButton.addEventListener("click", () => {
+          fileInput.click();
+        });
+
+        // Handle file selection
+        fileInput.addEventListener("change", (e) => {
+          handleFileSelection(e.target.files);
+          fileInput.value = ""; // Reset input
+        });
+
+        // Enable drag and drop
+        const messageInput = document.getElementById("messageInput");
+        messageInput.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          messageInput.classList.add("drag-over");
+        });
+
+        messageInput.addEventListener("dragleave", () => {
+          messageInput.classList.remove("drag-over");
+        });
+
+        messageInput.addEventListener("drop", (e) => {
+          e.preventDefault();
+          messageInput.classList.remove("drag-over");
+          handleFileSelection(e.dataTransfer.files);
+        });
+      }
+
+      function handleFileSelection(files) {
+        if (files.length === 0) return;
+
+        const filePreviews = document.getElementById("filePreviews");
+        const newFiles = Array.from(files);
+
+        // Validate files
+        const validFiles = [];
+        const errors = [];
+
+        newFiles.forEach((file) => {
+          const error = fileUploader.validateFile(file);
+          if (error) {
+            errors.push(error);
+          } else {
+            validFiles.push(file);
+          }
+        });
+
+        // Show errors
+        errors.forEach((error) => showNotification(error, "error"));
+
+        if (validFiles.length === 0) return;
+
+        // Add to selected files
+        selectedFiles = [...selectedFiles, ...validFiles];
+
+        // Show file previews
+        filePreviews.style.display = "block";
+        updateFilePreviews();
+
+        // Show notification
+        showNotification(`Added ${validFiles.length} file(s)`, "success");
+      }
+
+      function updateFilePreviews() {
+        const filePreviews = document.getElementById("filePreviews");
+        filePreviews.innerHTML = "";
+
+        selectedFiles.forEach((file, index) => {
+          const preview = fileUploader.createFilePreview(file);
+
+          // Add remove button functionality
+          const removeBtn = preview.querySelector(".remove-file");
+          removeBtn.addEventListener("click", () => {
+            selectedFiles.splice(index, 1);
+            updateFilePreviews();
+
+            if (selectedFiles.length === 0) {
+              filePreviews.style.display = "none";
+            }
+          });
+
+          filePreviews.appendChild(preview);
+        });
+      }
+
+      // Update the sendMessage function
+      async function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const content = messageInput.value.trim();
+
+        if (!content && selectedFiles.length === 0) return;
+
+        try {
+          if (selectedFiles.length === 0) {
+            // Upload files with progress tracking
+            await handleFileUploadWithProgress(selectedFiles, content);
+          } else {
+            // Regular text message
+            await conversationService.sendMessage(content);
+          }
+          // Send message with files
+          await conversationService.sendMessage(content, selectedFiles);
+
+          // Clear input and files
+          messageInput.value = "";
+          selectedFiles = [];
+          document.getElementById("filePreviews").style.display = "none";
+          document.getElementById("filePreviews").innerHTML = "";
+        } catch (error) {
+          showNotification("Error sending message", "error");
+        }
+      }
+
+      // Update the displayMessage function
+      function displayMessage(message, type) {
+        const chatMessages = document.getElementById("chatMessages");
+
+        // Remove typing indicator if present
+        const typingIndicator = chatMessages.querySelector(".typing-indicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+
+        let messageElement;
+
+        // Handle different message types
+        if (message.attachments && message.attachments.length > 0) {
+          messageElement = fileMessageUI.createFileMessageBubble(
+            message,
+            type === "sent"
+          );
+        } else {
+          messageElement = document.createElement("div");
+          messageElement.className = `message ${type}`;
+          messageElement.innerHTML = `
+                  <div class="message-content">
+                      <p>${message.content}</p>
+                      <div class="message-time">${formatTime(
+                        message.timestamp
+                      )}</div>
+                  </div>
+              `;
+        }
+
+        chatMessages.appendChild(messageElement);
+      }
+
+      // Add this to your initMessagesPage function
+      function initMessagesPage() {
+        // ... existing code ...
+        setupFileUpload();
+        setupProgressTracking();
+        // ... rest of the code ...
+      }
+
+      // Check authentication
+      if (!requireAuth()) return;
+
+      const currentUser = getCurrentUser();
+      let conversations = [];
+      let currentConversation = null;
+      let isTyping = false;
+      let typingTimeout = null;
+
+      // Initialize the page
+      async function initMessagesPage() {
+        if (!conversationService.initialize()) {
+          showNotification("Failed to connect to messaging service", "error");
+          return;
+        }
+
+        // Set up event listeners
+        setupEventListeners();
+
+        // Load conversations
+        await loadConversations();
+
+        // Set up conversation service handlers
+        setupConversationHandlers();
+      }
+
+      // Set up UI event listeners
+      function setupEventListeners() {
+        // Message input handling
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendMessage");
+
+        messageInput.addEventListener("input", handleInputTyping);
+        messageInput.addEventListener("keydown", handleKeyDown);
+        sendButton.addEventListener("click", sendMessage);
+
+        // Conversation search
+        const searchInput = document.querySelector(
+          ".conversations-search input"
+        );
+        searchInput.addEventListener("input", handleSearch);
+      }
+
+      // Set up conversation service event handlers
+      function setupConversationHandlers() {
+        // Handle incoming messages
+        conversationService.onMessage((message, type) => {
+          if (
+            currentConversation &&
+            (message.sender._id === currentConversation.userId ||
+              message.receiver === currentConversation.userId)
+          ) {
+            displayMessage(message, type);
+            scrollToBottom();
+          }
+        });
+
+        // Handle typing indicators
+        conversationService.onTyping((data) => {
+          if (
+            currentConversation &&
+            data.userId === currentConversation.userId
+          ) {
+            showTypingIndicator(data.isTyping);
+          }
+        });
+
+        // Handle read receipts
+        conversationService.onReadReceipt((data) => {
+          // Update UI to show messages as read
+          if (
+            currentConversation &&
+            data.readerId === currentConversation.userId
+          ) {
+            markMessagesAsRead();
+          }
+        });
+      }
+
+      // Load conversations list
+      async function loadConversations() {
+        try {
+          conversations = await messagesAPI.getConversations();
+          displayConversations(conversations);
+
+          // Auto-select first conversation if none selected
+          if (conversations.length > 0 && !currentConversation) {
+            selectConversation(conversations[0].userId);
+          }
+        } catch (error) {
+          showNotification("Error loading conversations", "error");
+        }
+      }
+
+      // Display conversations in sidebar
+      function displayConversations(conversations) {
+        const conversationsList = document.querySelector(".conversations-list");
+        conversationsList.innerHTML = "";
+
+        if (conversations.length === 0) {
+          conversationsList.innerHTML = `
+                        <div class="no-conversations">
+                            <p>No conversations yet</p>
+                            <p>Start matching with people to begin messaging!</p>
+                        </div>
+                    `;
+          return;
+        }
+
+        conversations.forEach((convo) => {
+          const convoElement = document.createElement("div");
+          convoElement.className = `conversation-item ${
+            currentConversation?.userId === convo.userId ? "active" : ""
+          }`;
+          convoElement.innerHTML = `
+                        <img src="${
+                          convo.avatar || "https://placehold.co/50x50"
+                        }" alt="${convo.name}" class="conversation-avatar">
+                        <div class="conversation-info">
+                            <div class="conversation-top">
+                                <div class="conversation-name">${
+                                  convo.name
+                                }</div>
+                                <div class="conversation-time">${formatTime(
+                                  convo.timestamp
+                                )}</div>
+                            </div>
+                            <div class="conversation-preview">${
+                              convo.lastMessage
+                            }</div>
+                        </div>
+                        <div class="conversation-meta">
+                            ${
+                              convo.online
+                                ? '<div class="online-status"></div>'
+                                : ""
+                            }
+                            ${
+                              convo.unreadCount > 0
+                                ? `<div class="unread-count">${convo.unreadCount}</div>`
+                                : ""
+                            }
+                        </div>
+                    `;
+
+          convoElement.addEventListener("click", () =>
+            selectConversation(convo.userId)
+          );
+          conversationsList.appendChild(convoElement);
+        });
+      }
+
+      // Select a conversation
+      async function selectConversation(userId) {
+        try {
+          // Update UI
+          document.querySelectorAll(".conversation-item").forEach((item) => {
+            item.classList.remove("active");
+          });
+
+          document
+            .querySelector(
+              `.conversation-item:nth-child(${
+                getConversationIndex(userId) + 1
+              })`
+            )
+            ?.classList.add("active");
+
+          // Load conversation messages
+          const messages = await messagesAPI.getConversation(userId);
+
+          // Get conversation details
+          const conversation = conversations.find((c) => c.userId === userId);
+
+          // Update current conversation
+          currentConversation = {
+            userId: userId,
+            name: conversation.name,
+            avatar: conversation.avatar,
+          };
+
+          // Update chat header
+          updateChatHeader(conversation);
+
+          // Display messages
+          displayMessages(messages);
+
+          // Join conversation room
+          conversationService.joinConversation(
+            `conversation_${userId}`,
+            userId
+          );
+
+          // Mark messages as read
+          await messagesAPI.markAsRead(userId);
+          conversationService.markMessagesAsRead(userId);
+
+          // Clear unread count
+          clearUnreadCount(userId);
+        } catch (error) {
+          showNotification("Error loading conversation", "error");
+        }
+      }
+
+      // Display messages in chat
+      function displayMessages(messages) {
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.innerHTML = "";
+
+        messages.forEach((message) => {
+          displayMessage(
+            message,
+            message.sender._id === currentUser.id ? "sent" : "received"
+          );
+        });
+
+        scrollToBottom();
+      }
+
+      // Display a single message
+      function displayMessage(message, type) {
+        const chatMessages = document.getElementById("chatMessages");
+
+        // Remove typing indicator if present
+        const typingIndicator = chatMessages.querySelector(".typing-indicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+        messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <p>${message.content}</p>
+                        <div class="message-time">${formatTime(
+                          message.timestamp
+                        )}</div>
+                    </div>
+                `;
+
+        chatMessages.appendChild(messageDiv);
+      }
+
+      // Send a message
+      async function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const content = messageInput.value.trim();
+
+        if (!content || !currentConversation) return;
+
+        try {
+          // Clear input
+          messageInput.value = "";
+
+          // Stop typing indicator
+          conversationService.stopTyping();
+          clearTimeout(typingTimeout);
+
+          // Send message
+          conversationService.sendMessage(content);
+        } catch (error) {
+          showNotification("Error sending message", "error");
+        }
+      }
+
+      // Handle typing indicators
+      function handleInputTyping() {
+        if (!currentConversation) return;
+
+        if (!isTyping) {
+          isTyping = true;
+          conversationService.startTyping();
+        }
+
+        // Reset typing timeout
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          isTyping = false;
+          conversationService.stopTyping();
+        }, 1000);
+      }
+
+      // Handle keyboard events
+      function handleKeyDown(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      }
+
+      // Show/hide typing indicator
+      function showTypingIndicator(show) {
+        const chatMessages = document.getElementById("chatMessages");
+        let typingIndicator = chatMessages.querySelector(".typing-indicator");
+
+        if (show && !typingIndicator) {
+          typingIndicator = document.createElement("div");
+          typingIndicator.className = "typing-indicator";
+          typingIndicator.innerHTML = `
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    `;
+          chatMessages.appendChild(typingIndicator);
+          scrollToBottom();
+        } else if (!show && typingIndicator) {
+          typingIndicator.remove();
+        }
+      }
+
+      // Mark messages as read in UI
+      function markMessagesAsRead() {
+        // Implementation for updating UI to show messages as read
+      }
+
+      // Clear unread count for a conversation
+      function clearUnreadCount(userId) {
+        const conversation = conversations.find((c) => c.userId === userId);
+        if (conversation) {
+          conversation.unreadCount = 0;
+          displayConversations(conversations);
+        }
+      }
+
+      // Update chat header
+      function updateChatHeader(conversation) {
+        document.querySelector(".chat-user-info h3").textContent =
+          conversation.name;
+        document.querySelector(".chat-user-avatar").src =
+          conversation.avatar || "https://placehold.co/40x40";
+      }
+
+      // Scroll to bottom of chat
+      function scrollToBottom() {
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Format time for display
+      function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Get conversation index
+      function getConversationIndex(userId) {
+        return conversations.findIndex((c) => c.userId === userId);
+      }
+
+      // Handle search
+      function handleSearch(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredConversations = conversations.filter(
+          (convo) =>
+            convo.name.toLowerCase().includes(searchTerm) ||
+            convo.lastMessage.toLowerCase().includes(searchTerm)
+        );
+        displayConversations(filteredConversations);
+      }
+
+      // Initialize the page
+      document.addEventListener("DOMContentLoaded", initMessagesPage);
+    </script>
+
+    <!-- Include Socket.io client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Your JavaScript modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/socket.js"></script>
+  </body>
+</html>
