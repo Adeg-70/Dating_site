@@ -14,6 +14,8 @@ const matchesRoutes = require("./routes/matches");
 const messagesRoutes = require("./routes/messages");
 const chunkedUploadRoutes = require("./routes/chunkedUpload");
 
+const tf = require("@tensorflow/tfjs");
+
 const config = require("./config/" +
   (process.env.NODE_ENV || "development") +
   ".json");
@@ -195,6 +197,6 @@ mongoose
 
 // 9. Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

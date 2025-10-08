@@ -1,19 +1,29 @@
-const tf = require("@tensorflow/tfjs-node");
+const tf = require("@tensorflow/tfjs");
 const redis = require("redis");
 
-// Install: npm install @tensorflow/tfjs-node redis
+// Install: npm install @tensorflow/tfjs redis
 class BandwidthPredictor {
   constructor() {
     this.model = null;
+
+    //Replace this entire redis.createClient section:
     this.redisClient = redis.createClient({
-      host: process.env.REDIS_HOST || "localhost",
-      port: process.env.REDIS_PORT || 6379,
+      url: process.env.REDIS_HOST || "redis://localhost:6379",
     });
+
     this.trainingData = [];
     this.isTraining = false;
+
+    this.redisClient.on("error", (err) => {
+      console.error("Redis Client Error", err);
+    });
   }
 
   async initialize() {
+    if (!this.redisClient.isOpen) {
+      await this.redisClient.connect();
+    }
+
     await this.loadModel();
     await this.loadTrainingData();
     this.startTrainingInterval();
