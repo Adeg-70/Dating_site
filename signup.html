@@ -6,7 +6,7 @@
     <title>Sign Up - LoveConnect</title>
     <link rel="stylesheet" href="style.css" />
     <style>
-      /* Signup-specific styles */
+      /* Your existing CSS styles remain exactly the same */
       .signup-container {
         display: flex;
         min-height: calc(100vh - 200px);
@@ -197,6 +197,8 @@
         text-decoration: underline;
       }
 
+      /* ... ALL YOUR EXISTING CSS STYLES ... */
+
       @media (max-width: 600px) {
         .form-row {
           flex-direction: column;
@@ -210,7 +212,7 @@
     </style>
   </head>
   <body>
-    <!-- Navigation Bar (same as index.html) -->
+    <!-- Navigation Bar (same as your original) -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-logo">LoveConnect</div>
@@ -225,25 +227,11 @@
           <li class="nav-item">
             <a href="#" class="nav-link">Success Stories</a>
           </li>
-          <!-- For logged out state (index, login, signup) -->
           <li class="nav-item">
             <a href="login.html" class="nav-link login-btn">Login</a>
           </li>
           <li class="nav-item">
             <a href="signup.html" class="nav-link signup-btn">Sign Up</a>
-          </li>
-
-          <!-- For logged in state (dashboard) -->
-          <li class="nav-item">
-            <a href="messages.html" class="nav-link"
-              >Messages <span class="notification-badge">3</span></a
-            >
-          </li>
-          <li class="nav-item">
-            <a href="profile.html" class="nav-link">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a href="index.html" class="nav-link login-btn">Logout</a>
           </li>
         </ul>
       </div>
@@ -357,7 +345,7 @@
       </div>
     </section>
 
-    <!-- Footer (same as index.html) -->
+    <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-section">
@@ -384,68 +372,151 @@
       </div>
     </footer>
 
+    <!-- REPLACE ALL YOUR SCRIPT TAGS WITH THIS SINGLE CORRECTED VERSION -->
     <script type="module">
-      import { register, redirectIfLoggedIn } from "./js/auth.js";
+      import {
+        register,
+        redirectIfLoggedIn,
+        isLoggedIn,
+        getCurrentUser,
+        logout,
+      } from "./js/auth.js";
       import {
         showNotification,
         validateEmail,
         validatePassword,
       } from "./js/utils.js";
 
-      // Redirect if already logged in
-      if (redirectIfLoggedIn()) {
-        window.location.href = "dashboard.html";
-      }
+      // Wait for DOM to be fully loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded - initializing signup form");
 
-      // Password strength indicator
-      const passwordInput = document.getElementById("password");
-      const strengthMeter = document.getElementById("passwordStrength");
-
-      passwordInput.addEventListener("input", function () {
-        const password = passwordInput.value;
-        const error = validatePassword(password);
-
-        if (error) {
-          strengthMeter.style.width = "33%";
-          strengthMeter.style.backgroundColor = "#e74c3c";
-        } else if (password.length < 8) {
-          strengthMeter.style.width = "66%";
-          strengthMeter.style.backgroundColor = "#f39c12";
-        } else {
-          strengthMeter.style.width = "100%";
-          strengthMeter.style.backgroundColor = "#2ecc71";
+        // Redirect if already logged in
+        if (redirectIfLoggedIn()) {
+          window.location.href = "dashboard.html";
+          return;
         }
-      });
 
-      document
-        .getElementById("signupForm")
-        .addEventListener("submit", async function (e) {
+        // Update navigation based on login state
+        const user = getCurrentUser();
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (isLoggedIn() && user) {
+          // User is logged in
+          navMenu.innerHTML = `
+            <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
+            <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
+            <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
+            <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
+          `;
+
+          document
+            .querySelector(".logout-btn")
+            .addEventListener("click", function (e) {
+              e.preventDefault();
+              logout();
+            });
+        }
+
+        // Password strength indicator
+        const passwordInput = document.getElementById("password");
+        const strengthMeter = document.getElementById("passwordStrength");
+
+        if (passwordInput && strengthMeter) {
+          passwordInput.addEventListener("input", function () {
+            const password = passwordInput.value;
+            const error = validatePassword(password);
+
+            if (error) {
+              strengthMeter.style.width = "33%";
+              strengthMeter.style.backgroundColor = "#e74c3c";
+            } else if (password.length < 8) {
+              strengthMeter.style.width = "66%";
+              strengthMeter.style.backgroundColor = "#f39c12";
+            } else {
+              strengthMeter.style.width = "100%";
+              strengthMeter.style.backgroundColor = "#2ecc71";
+            }
+          });
+        }
+
+        // Set max date for birthdate to ensure 18+ only
+        const birthdateInput = document.getElementById("birthdate");
+        if (birthdateInput) {
+          const today = new Date();
+          const maxDate = new Date();
+          maxDate.setFullYear(today.getFullYear() - 18);
+          birthdateInput.setAttribute(
+            "max",
+            maxDate.toISOString().split("T")[0]
+          );
+        }
+
+        // Main form submission handler
+        const signupForm = document.getElementById("signupForm");
+
+        if (!signupForm) {
+          console.error("Signup form not found!");
+          return;
+        }
+
+        signupForm.addEventListener("submit", async function (e) {
           e.preventDefault();
+          console.log("Form submission started");
 
+          // Get form data from ACTUAL fields in your HTML
           const formData = {
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-            firstName: document.getElementById("firstName").value,
-            lastName: document.getElementById("lastName").value,
-            age: parseInt(document.getElementById("age").value),
-            gender: document.getElementById("gender").value,
-            interestedIn: document.getElementById("interestedIn").value,
-            location: document.getElementById("location").value,
+            firstName: document.getElementById("firstName")?.value,
+            lastName: document.getElementById("lastName")?.value,
+            email: document.getElementById("email")?.value,
+            password: document.getElementById("password")?.value,
+            gender: document.getElementById("gender")?.value,
+            interestedIn: document.getElementById("interestedIn")?.value,
+            birthdate: document.getElementById("birthdate")?.value,
           };
 
-          // Validate form data
+          // Validate required fields
+          if (
+            !formData.firstName ||
+            !formData.lastName ||
+            !formData.email ||
+            !formData.password ||
+            !formData.gender ||
+            !formData.interestedIn ||
+            !formData.birthdate
+          ) {
+            showNotification("Please fill in all required fields", "error");
+            return;
+          }
+
+          // Validate email
           if (!validateEmail(formData.email)) {
             showNotification("Please enter a valid email address", "error");
             return;
           }
 
+          // Validate password
           const passwordError = validatePassword(formData.password);
           if (passwordError) {
             showNotification(passwordError, "error");
             return;
           }
 
-          if (formData.age < 18) {
+          // Validate age from birthdate
+          const birthDate = new Date(formData.birthdate);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+
+          if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && today.getDate() < birthDate.getDate())
+          ) {
+            age--;
+          }
+
+          if (age < 18) {
             showNotification(
               "You must be at least 18 years old to register",
               "error"
@@ -459,7 +530,38 @@
           signupButton.textContent = "Creating account...";
           signupButton.disabled = true;
 
+          fetch("http://localhost:5000/api/auth/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+          })
+            .then((response) => {
+              // First, check if the request was successful
+              if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+              }
+              return response.json(); // Parse the JSON only if the response is OK
+            })
+            .then((data) => {
+              // Now you can safely use 'data'
+              if (data.success) {
+                console.log("Registration successful!");
+                window.location.href = "/login.html";
+              } else {
+                console.error("Registration failed:", data.message);
+                // Show error message to the user
+              }
+            })
+            .catch((error) => {
+              // This will catch both network errors and the 'throw' from above
+              console.error("Registration error:", error);
+              // Show a generic error message to the user
+            });
+
           try {
+            console.log("Attempting registration with:", formData);
             const result = await register(formData);
 
             if (result.success) {
@@ -471,74 +573,21 @@
                 window.location.href = "profile.html";
               }, 1000);
             } else {
-              showNotification(result.error, "error");
+              showNotification(result.error || "Registration failed", "error");
               signupButton.textContent = originalText;
               signupButton.disabled = false;
             }
           } catch (error) {
+            console.error("Registration error:", error);
             showNotification("An error occurred during registration", "error");
             signupButton.textContent = originalText;
             signupButton.disabled = false;
           }
         });
-
-      // Set max date for birthdate to ensure 18+ only
-      window.addEventListener("load", function () {
-        const today = new Date();
-        const maxDate = new Date();
-        maxDate.setFullYear(today.getFullYear() - 18);
-        document
-          .getElementById("birthdate")
-          .setAttribute("max", maxDate.toISOString().split("T")[0]);
       });
     </script>
 
-    <script type="module">
-      import { isLoggedIn, getCurrentUser, logout } from "./js/auth.js";
-
-      document.addEventListener("DOMContentLoaded", function () {
-        // Update navigation based on login state
-        const user = getCurrentUser();
-        const navMenu = document.querySelector(".nav-menu");
-
-        if (isLoggedIn() && user) {
-          // User is logged in - show appropriate navigation
-          navMenu.innerHTML = `
-              <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-              <li class="nav-item"><a href="browse.html" class="nav-link">Browse</a></li>
-              <li class="nav-item"><a href="messages.html" class="nav-link">Messages</a></li>
-              <li class="nav-item"><a href="profile.html" class="nav-link">Profile</a></li>
-              <li class="nav-item"><a href="#" class="nav-link login-btn logout-btn">Logout</a></li>
-          `;
-
-          // Add logout event listener
-          document
-            .querySelector(".logout-btn")
-            .addEventListener("click", function (e) {
-              e.preventDefault();
-              logout();
-            });
-        } else {
-          // User is not logged in
-          navMenu.innerHTML = `
-              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
-              <li class="nav-item"><a href="#" class="nav-link">Browse</a></li>
-              <li class="nav-item"><a href="#" class="nav-link">How it Works</a></li>
-              <li class="nav-item"><a href="#" class="nav-link">Success Stories</a></li>
-              <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
-              <li class="nav-item"><a href="signup.html" class="nav-link signup-btn">Sign Up</a></li>
-          `;
-        }
-      });
-    </script>
-
-    <!-- Include Socket.io client -->
+    <!-- External scripts -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-
-    <!-- Your JavaScript modules -->
-    <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/api.js"></script>
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/socket.js"></script>
   </body>
 </html>

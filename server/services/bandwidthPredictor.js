@@ -1,37 +1,65 @@
 const tf = require("@tensorflow/tfjs");
 const redis = require("redis");
 
-// Install: npm install @tensorflow/tfjs redis
 class BandwidthPredictor {
   constructor() {
     this.model = null;
 
-    //Replace this entire redis.createClient section:
+    // FIXED: Use REDIS_URL instead of REDIS_HOST and proper connection configuration
     this.redisClient = redis.createClient({
-      url: process.env.REDIS_HOST || "redis://localhost:6379",
+      url: process.env.REDIS_URL || "redis://localhost:6379", // Critical fix: REDIS_URL not REDIS_HOST
     });
 
     this.trainingData = [];
     this.isTraining = false;
 
+    // Enhanced error handling
     this.redisClient.on("error", (err) => {
       console.error("Redis Client Error", err);
+    });
+
+    this.redisClient.on("connect", () => {
+      console.log("Redis connection established!");
+    });
+
+    this.redisClient.on("ready", () => {
+      console.log("Redis client is ready to use");
+    });
+
+    this.redisClient.on("end", () => {
+      console.log("Redis connection closed");
     });
   }
 
   async initialize() {
-    if (!this.redisClient.isOpen) {
-      await this.redisClient.connect();
-    }
+    try {
+      // FIXED: Added connection check with proper error handling
+      if (!this.redisClient.isOpen) {
+        console.log("Attempting to connect to Redis...");
+        await this.redisClient.connect();
+      }
 
-    await this.loadModel();
-    await this.loadTrainingData();
-    this.startTrainingInterval();
+      await this.loadModel();
+      await this.loadTrainingData();
+      this.startTrainingInterval();
+    } catch (error) {
+      console.error("Failed to initialize BandwidthPredictor:", error);
+      // Don't throw if Redis fails - allow app to continue without this feature
+      this.trainingData = []; // Use empty dataset as fallback
+    }
+  }
+
+  startTrainingInterval() {
+    // Train every 6 hours
+    setInterval(() => {
+      if (this.trainingData.length >= 100) {
+        this.trainModel();
+      }
+    }, 6 * 60 * 60 * 1000);
   }
 
   async loadModel() {
     try {
-      // Try to load existing model
       this.model = await tf.loadLayersModel(
         "file://./models/bandwidth/model.json"
       );
@@ -59,135 +87,53 @@ class BandwidthPredictor {
     });
   }
 
-  async predictBandwidth(features) {
-    if (!this.model || this.trainingData.length < 100) {
-      // Not enough data, return conservative estimate
-      return 1 * 1024 * 1024; // 1 MB/s default
-    }
-
-    try {
-      const input = tf.tensor2d([features]);
-      const prediction = this.model.predict(input);
-      const bandwidth = (await prediction.data())[0];
-
-      // Ensure reasonable values
-      return Math.max(100 * 1024, Math.min(bandwidth, 100 * 1024 * 1024)); // 100KB/s to 100MB/s
-    } catch (error) {
-      console.error("Prediction error:", error);
-      return 1 * 1024 * 1024;
-    }
-  }
-
-  async addTrainingSample(features, actualBandwidth) {
-    this.trainingData.push({ features, actualBandwidth });
-
-    // Store in Redis for persistence
-    await this.redisClient.lPush(
-      "bandwidth_training_data",
-      JSON.stringify({ features, actualBandwidth, timestamp: Date.now() })
-    );
-
-    // Keep only recent data (last 10,000 samples)
-    await this.redisClient.lTrim("bandwidth_training_data", 0, 9999);
-
-    // Train if we have enough data
-    if (this.trainingData.length >= 100 && !this.isTraining) {
-      this.trainModel();
-    }
-  }
-
   async loadTrainingData() {
     try {
+      // FIXED: Added connection check before Redis operation
+      if (!this.redisClient.isReady) {
+        console.log("Redis not ready, using empty training data");
+        this.trainingData = [];
+        return;
+      }
+
       const data = await this.redisClient.lRange(
         "bandwidth_training_data",
         0,
         -1
       );
       this.trainingData = data.map((item) => JSON.parse(item));
+      console.log(
+        `Loaded ${this.trainingData.length} training samples from Redis`
+      );
     } catch (error) {
-      console.error("Error loading training data:", error);
-      this.trainingData = [];
+      console.error("Error loading training data, using empty dataset:", error);
+      this.trainingData = []; // Fallback to empty array
     }
   }
 
-  async trainModel() {
-    if (this.isTraining || this.trainingData.length < 100) return;
-
-    this.isTraining = true;
-    console.log("Training bandwidth prediction model...");
+  async addTrainingSample(features, actualBandwidth) {
+    this.trainingData.push({ features, actualBandwidth });
 
     try {
-      // Prepare training data
-      const features = this.trainingData.map((item) => item.features);
-      const labels = this.trainingData.map((item) => item.actualBandwidth);
+      // FIXED: Only attempt Redis operations if client is ready
+      if (this.redisClient.isReady) {
+        await this.redisClient.lPush(
+          "bandwidth_training_data",
+          JSON.stringify({ features, actualBandwidth, timestamp: Date.now() })
+        );
+        await this.redisClient.lTrim("bandwidth_training_data", 0, 9999);
+      }
 
-      const featuresTensor = tf.tensor2d(features);
-      const labelsTensor = tf.tensor2d(labels, [labels.length, 1]);
-
-      // Train the model
-      await this.model.fit(featuresTensor, labelsTensor, {
-        epochs: 50,
-        batchSize: 32,
-        validationSplit: 0.2,
-        callbacks: {
-          onEpochEnd: (epoch, logs) => {
-            if (epoch % 10 === 0) {
-              console.log(`Epoch ${epoch}: loss = ${logs.loss}`);
-            }
-          },
-        },
-      });
-
-      // Save the model
-      await this.model.save("file://./models/bandwidth/");
-      console.log("Bandwidth prediction model trained and saved");
-    } catch (error) {
-      console.error("Training error:", error);
-    } finally {
-      this.isTraining = false;
-      // Clean up old data (older than 30 days)
-      await this.cleanOldTrainingData();
-    }
-  }
-
-  async cleanOldTrainingData() {
-    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    this.trainingData = this.trainingData.filter(
-      (item) => item.timestamp > thirtyDaysAgo
-    );
-
-    await this.redisClient.del("bandwidth_training_data");
-    for (const item of this.trainingData) {
-      await this.redisClient.lPush(
-        "bandwidth_training_data",
-        JSON.stringify(item)
-      );
-    }
-  }
-
-  startTrainingInterval() {
-    // Train every 6 hours
-    setInterval(() => {
-      if (this.trainingData.length >= 100) {
+      if (this.trainingData.length >= 100 && !this.isTraining) {
         this.trainModel();
       }
-    }, 6 * 60 * 60 * 1000);
+    } catch (error) {
+      console.error("Failed to save training sample to Redis:", error);
+      // Continue without Redis persistence
+    }
   }
 
-  extractFeatures(networkInfo, historicalData) {
-    return [
-      networkInfo.downlink || 0,
-      networkInfo.rtt || 0,
-      networkInfo.effectiveType === "4g" ? 1 : 0,
-      networkInfo.effectiveType === "3g" ? 1 : 0,
-      networkInfo.effectiveType === "2g" ? 1 : 0,
-      historicalData.avgBandwidth || 0,
-      historicalData.peakBandwidth || 0,
-      historicalData.successRate || 0,
-      historicalData.uploadCount || 0,
-      (Date.now() % (24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000), // Time of day
-    ];
-  }
+  // ... (keep the rest of your methods: predictBandwidth, trainModel, cleanOldTrainingData, startTrainingInterval, extractFeatures the same)
 }
 
 module.exports = new BandwidthPredictor();

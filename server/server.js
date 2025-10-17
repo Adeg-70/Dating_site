@@ -27,7 +27,16 @@ const app = express();
 const server = http.createServer(app);
 
 // 3. Now configure middleware (AFTER app declaration)
-app.use(cors({ origin: config.corsOrigin }));
+/*app.use(cors({ origin: config.corsOrigin }));*/
+
+// With this:
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://127.0.0.1:5500"], // Add your origins here
+    credentials: true, // Keep this if you're using cookies/sessions
+  })
+);
+
 app.use(express.json());
 app.use(express.static("../")); // Serve frontend files
 
@@ -184,12 +193,25 @@ app.use("/api/messages", messagesRoutes);
 app.use("/api/upload/chunked", chunkedUploadRoutes);
 
 // 8. MongoDB connection with error handling
-mongoose
+/*mongoose
   .connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/loveconnect", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => console.log("MongoDB connected successfully"))
+  .catch((err) => {
+    console.log("MongoDB connection error:", err);*/
+
+/*mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })*/
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+
+  .then(() => console.log("MongoDB connected successfully to Atlas!"))
   .catch((err) => {
     console.log("MongoDB connection error:", err);
     process.exit(1); // Exit if database connection fails
